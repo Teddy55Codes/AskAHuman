@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.0.0
+MinimumVisualStudioVersion = 16.0.0.0
+Project("{EA4B40F8-8514-4B51-9BC6-0039C5D53619}") = "AskAHuman", "AskAHuman\AskAHuman.csproj", "{14141214-F0C9-4EFA-AC09-20863792EA04}"
+EndProject
+Project("{EA4B40F8-8514-4B51-9BC6-0039C5D53619}") = "AskAHuman.Client", "AskAHuman.Client\AskAHuman.Client.csproj", "{E236D2D0-DEE5-4C5C-9B10-8E4BBD25702B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{14141214-F0C9-4EFA-AC09-20863792EA04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14141214-F0C9-4EFA-AC09-20863792EA04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E236D2D0-DEE5-4C5C-9B10-8E4BBD25702B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E236D2D0-DEE5-4C5C-9B10-8E4BBD25702B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {94657A3A-691E-4BF9-9811-9A9F88DB1AF3}
+	EndGlobalSection
+EndGlobal
