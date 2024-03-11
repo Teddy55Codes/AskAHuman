@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `AskAHuman`.`Users` (
                                                    `Username` TEXT NOT NULL,
                                                    `PasswordHash` TEXT NOT NULL,
                                                    `PasswordSalt` TEXT NOT NULL,
-                                                   `Reputation` BIGINT GENERATED ALWAYS AS (0) VIRTUAL,
+                                                   `Reputation` BIGINT NOT NULL DEFAULT 0,
                                                    `CreatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                                    `LastOnlineAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                                    PRIMARY KEY (`Id`))

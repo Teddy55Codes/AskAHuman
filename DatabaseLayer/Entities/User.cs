@@ -13,7 +13,7 @@ public partial class User
 
     public string PasswordSalt { get; set; } = null!;
 
-    public long? Reputation { get; set; }
+    public long Reputation { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
