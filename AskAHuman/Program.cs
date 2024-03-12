@@ -1,5 +1,8 @@
 using AskAHuman.Client.Pages;
 using AskAHuman.Components;
+using AskAHuman.Services;
+using AskAHuman.Services.Interfaces;
+using DatabaseLayer;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +13,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddMudServices();
+builder.Services.AddTransient<IDbService, DbService>();
+builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
+builder.Services.AddTransient<IUserService, UserService>();
 
 var app = builder.Build();
 
