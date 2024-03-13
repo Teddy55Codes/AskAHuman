@@ -3,6 +3,8 @@ using AskAHuman.Components;
 using AskAHuman.Services;
 using AskAHuman.Services.Interfaces;
 using DatabaseLayer;
+using DatabaseLayer.Context;
+using DatabaseLayer.UnitOfWork;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddMudServices();
+builder.Services.AddTransient<IAskAHumanDbContextFactory, AskAHumanDbContextFactory>();
+builder.Services.AddTransient<IUnitOfWorkFactory, UnitOfWorkFactory>();
 builder.Services.AddTransient<IDbService, DbService>();
 builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
 builder.Services.AddTransient<IUserService, UserService>();
