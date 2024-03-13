@@ -5,13 +5,14 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
-  
   
   <ItemGroup>
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.4.0" />
-    <ProjectReference Include="..\AskAHuman.Client\AskAHuman.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.0-rc.2.23480.2" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\AskAHuman.Client\AskAHuman.Client.csproj" />
     <ProjectReference Include="..\DatabaseLayer\DatabaseLayer.csproj" />
   </ItemGroup>
 
