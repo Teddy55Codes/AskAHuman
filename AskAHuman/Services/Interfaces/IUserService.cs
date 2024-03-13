@@ -1,5 +1,5 @@
 ﻿using AskAHuman.API;
-using AskAHuman.DTOs;
+using DataBaseLayer.DTOs;
 
 namespace AskAHuman.Services.Interfaces;
 

@@ -1,4 +1,4 @@
-﻿namespace AskAHuman.DTOs;
+﻿namespace DataBaseLayer.DTOs;
 
 public class LoginDTO
 {

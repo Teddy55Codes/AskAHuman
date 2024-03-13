@@ -1,6 +1,6 @@
 ﻿using DatabaseLayer.Entities;
 
-namespace AskAHuman.DTOs;
+namespace DataBaseLayer.DTOs;
 
 public class UserDTO
 {

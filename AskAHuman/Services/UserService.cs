@@ -1,7 +1,7 @@
 ﻿using AskAHuman.API;
-using AskAHuman.DTOs;
 using AskAHuman.Services.Interfaces;
 using DatabaseLayer;
+using DataBaseLayer.DTOs;
 
 namespace AskAHuman.Services;
 

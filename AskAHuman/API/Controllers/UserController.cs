@@ -1,6 +1,5 @@
-﻿using AskAHuman.DTOs;
-using AskAHuman.Services.Interfaces;
-using DatabaseLayer;
+﻿using AskAHuman.Services.Interfaces;
+using DataBaseLayer.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
