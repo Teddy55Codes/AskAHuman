@@ -9,4 +9,5 @@ public class AskAHumanDbContextFactory : IAskAHumanDbContextFactory
     public AskAHumanDbContextFactory(IConfiguration configuration) => _configuration = configuration;
     
     public AskAHumanDbContext Create() => new(_configuration);
+    
 }
