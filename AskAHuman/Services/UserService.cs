@@ -41,7 +41,7 @@ public class UserService : IUserService
     {
         if (username == string.Empty) return true;
         using var unitOfWork = _dbService.UnitOfWork;
-        return unitOfWork.Users.GetByName(username) != null;
+        return unitOfWork.Users.GetByName(username.ToLower()) != null;
     }
 
     public bool RemoveUser(int id)
