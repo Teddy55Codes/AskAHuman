@@ -1,12 +1,86 @@
-﻿@inherits LayoutComponentBase
+﻿@using AskAHuman.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inherits LayoutComponentBase
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
 
 <MudThemeProvider IsDarkMode="true"/>
-<MudDialogProvider/>
-<MudSnackbarProvider/>
+<MudDialogProvider @rendermode="InteractiveServer"/>
+<MudSnackbarProvider @rendermode="InteractiveServer"/>
 
 <MudLayout>
-    <MudAppBar>Ask A Human</MudAppBar>
-    <MudMainContent>
-        @Body
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" OnClick="@ToggleDrawer"/>
+        <MudSpacer/>
+        <MudIconButton @bind-Icon="@accountIcon" Href="@accountIconTarget"/>
+    </MudAppBar>
+    <MudDrawer @bind-Open="@isDrawerOpen" Elevation="1">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">Ask A Human</MudText>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink Href="/chats" Icon="@Icons.Material.Filled.Chat">Chats</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+    <MudMainContent Class="pt-16 px-16">
+        <MudContainer Class="mt-6">
+            @Body
+        </MudContainer>
     </MudMainContent>
 </MudLayout>
+
+@code
+{
+    private string accountIcon = Icons.Material.Filled.PersonOff;
+    private string accountIconTarget = "/login"; 
+
+    private bool _isAuthenticated;
+    
+    private bool IsAuthenticated
+    {
+        get => _isAuthenticated;
+        set
+        {
+            _isAuthenticated = value;
+            accountIcon = _isAuthenticated ? Icons.Material.Filled.Person : Icons.Material.Filled.PersonOff;
+            accountIconTarget = _isAuthenticated ? "/account" : "/login";
+        }
+    }
+    
+    private bool isDrawerOpen = false;
+    
+    private void ToggleDrawer() => isDrawerOpen = !isDrawerOpen;
+
+    /// <inheritdoc />
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var jwt = await ProtectedSessionStore.GetAsync<string>("Jwt");
+        
+            if (jwt.Success)
+            {
+                var result = AuthenticationService.ValidateJWT(jwt.Value!);
+                IsAuthenticated = result.IsSuccess;
+                StateHasChanged();
+            }
+        } catch (InvalidOperationException) {}
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            var jwt = await ProtectedSessionStore.GetAsync<string>("Jwt");
+        
+            if (jwt.Success)
+            {
+                var result = AuthenticationService.ValidateJWT(jwt.Value!);
+                IsAuthenticated = result.IsSuccess;
+                StateHasChanged();
+            }
+        }
+    }
+}

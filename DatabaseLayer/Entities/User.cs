@@ -18,7 +18,9 @@ public partial class User
     public DateTime CreatedAt { get; set; }
 
     public DateTime LastOnlineAt { get; set; }
-
+    
+    public virtual ICollection<Message> Messagess { get; set; } = new List<Message>();
+    
     public virtual ICollection<Chat> ChatUsersAnswerers { get; set; } = new List<Chat>();
 
     public virtual ICollection<Chat> ChatUsersQuestionings { get; set; } = new List<Chat>();

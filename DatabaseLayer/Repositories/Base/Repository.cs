@@ -9,17 +9,17 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 
     public Repository(DbContext context) => _context = context;
 
-    public IEnumerable<TEntity> GetAll() => _context.Set<TEntity>().ToList();
+    public List<TEntity> GetAll() => _context.Set<TEntity>().ToList();
     
-    public IEnumerable<TEntity> GetPage(int index, int size) => _context.Set<TEntity>().Skip(index * size).Take(size).ToList(); 
+    public List<TEntity> GetPage(int index, int size) => _context.Set<TEntity>().Skip(index * size).Take(size).ToList(); 
     
     public TEntity? GetByPrimaryKey(object pk) => _context.Set<TEntity>().Find(pk);
     
     public int GetCount() => _context.Set<TEntity>().Count();
     
-    public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate) => _context.Set<TEntity>().Where(predicate).ToList();
+    public List<TEntity> Find(Expression<Func<TEntity, bool>> predicate) => _context.Set<TEntity>().Where(predicate).ToList();
     
-    public IEnumerable<TEntity> FindPaged(Expression<Func<TEntity, bool>> predicate, int index, int size) => _context.Set<TEntity>().Where(predicate).Skip(index * size).Take(size).ToList();
+    public List<TEntity> FindPaged(Expression<Func<TEntity, bool>> predicate, int index, int size) => _context.Set<TEntity>().Where(predicate).Skip(index * size).Take(size).ToList();
     
     public TEntity Add(TEntity entity) => _context.Set<TEntity>().Add(entity).Entity;
     

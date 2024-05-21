@@ -9,7 +9,11 @@ public partial class Message
 
     public long ChatId { get; set; }
 
+    public long AuthorId { get; set; }
+
     public string Content { get; set; } = null!;
 
     public DateTime CreatedAt { get; set; }
+    
+    public virtual User Author { get; set; }
 }

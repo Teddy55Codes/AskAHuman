@@ -26,9 +26,9 @@ public partial class AskAHumanDbContext(IConfiguration configuration) : DbContex
 
         modelBuilder.Entity<Chat>(entity =>
         {
-            entity.HasKey(e => new { e.Id, e.UsersAnswererId, e.UsersQuestioningId })
+            entity.HasKey(e => new { e.Id })
                 .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0 });
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0 });
 
             entity.ToTable("chats");
 
@@ -42,6 +42,8 @@ public partial class AskAHumanDbContext(IConfiguration configuration) : DbContex
             entity.Property(e => e.UsersAnswererId).HasColumnType("bigint(20)");
             entity.Property(e => e.UsersQuestioningId).HasColumnType("bigint(20)");
             entity.Property(e => e.Completed).HasColumnType("tinyint(4)");
+            entity.Property(e => e.Title).HasColumnType("text");
+            entity.Property(e => e.Question).HasColumnType("text");
 
             entity.HasOne(d => d.UsersAnswerer).WithMany(p => p.ChatUsersAnswerers)
                 .HasForeignKey(d => d.UsersAnswererId)
@@ -63,7 +65,9 @@ public partial class AskAHumanDbContext(IConfiguration configuration) : DbContex
             entity.ToTable("messages");
 
             entity.HasIndex(e => e.ChatId, "fk_Messages_Chats1_idx");
-
+            
+            entity.HasIndex(e => e.AuthorId, "fk_messages_users1_idx");
+            
             entity.Property(e => e.Id)
                 .ValueGeneratedOnAdd()
                 .HasColumnType("bigint(20)");
@@ -72,6 +76,11 @@ public partial class AskAHumanDbContext(IConfiguration configuration) : DbContex
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("datetime");
+            
+            entity.HasOne(d => d.Author).WithMany(p => p.Messagess)
+                .HasForeignKey(d => d.AuthorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_messages_users1_idx");
         });
 
         modelBuilder.Entity<Permission>(entity =>

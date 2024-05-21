@@ -4,12 +4,12 @@ namespace DatabaseLayer.Repositories.Base;
 
 public interface IRepository<TEntity> where TEntity : class
 {
-    public IEnumerable<TEntity> GetAll();
-    public IEnumerable<TEntity> GetPage(int index, int pageSize);
+    public List<TEntity> GetAll();
+    public List<TEntity> GetPage(int index, int pageSize);
     public TEntity? GetByPrimaryKey(object pk);
     public int GetCount();
-    public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
-    public IEnumerable<TEntity> FindPaged(Expression<Func<TEntity, bool>> predicate, int index, int size);
+    public List<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
+    public List<TEntity> FindPaged(Expression<Func<TEntity, bool>> predicate, int index, int size);
     
     public TEntity Add(TEntity entity);
     public void AddRange(IEnumerable<TEntity> entities);

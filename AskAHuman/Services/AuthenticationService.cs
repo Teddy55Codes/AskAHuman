@@ -5,6 +5,7 @@ using System.Text;
 using AskAHuman.Services.Interfaces;
 using DatabaseLayer;
 using DatabaseLayer.Entities;
+using FluentResults;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AskAHuman.Services;
@@ -64,6 +65,32 @@ public class AuthenticationService : IAuthenticationService
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+    
+    public Result<ClaimsPrincipal> ValidateJWT(string token)
+    {
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = _configuration["Jwt:Issuer"],
+            ValidAudience = _configuration["Jwt:Audience"],
+            IssuerSigningKey = securityKey
+        };
+
+        try
+        {
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken _);
+            return Result.Ok(principal);
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail("Jwt token is invalid.");
+        }
     }
 
     #region Hashing
