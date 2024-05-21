@@ -38,4 +38,8 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
+// auto apply migrations at startup
+var db = app.Services.GetRequiredService<IDbService>();
+db.ApplyMigrations();
+
 app.Run();

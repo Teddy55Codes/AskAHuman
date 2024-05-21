@@ -11,4 +11,5 @@ public interface IUnitOfWork : IDisposable
     public UserRepository Users { get; }
     
     public void Commit();
+    public void ApplyMigrations();
 }

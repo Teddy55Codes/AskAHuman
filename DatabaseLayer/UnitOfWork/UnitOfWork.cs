@@ -1,6 +1,7 @@
 ﻿using DatabaseLayer.UnitOfWork;
 using DatabaseLayer.Context;
 using DataBaseLayer.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseLayer.UnitOfWork;
 
@@ -29,6 +30,8 @@ public class UnitOfWork : IUnitOfWork
     public UserRepository Users => _userRepository ??= new UserRepository(_context);
     
     public void Commit() => _context.SaveChanges();
+
+    public void ApplyMigrations() => _context.Database.Migrate();
 
     public void Dispose() => _context.Dispose();
 }
