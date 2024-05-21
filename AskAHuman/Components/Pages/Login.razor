@@ -1,0 +1,63 @@
+﻿@page "/Login"
+
+@using System.ComponentModel.DataAnnotations
+@using AskAHuman.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <MudGrid Class="mt-1">
+        <MudItem xs="3"/>
+        <MudItem xs="6">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Username"
+                                  @bind-Value="model.Username" For="@(() => model.Username)"/>
+                    <MudTextField Label="Password" Class="mt-3"
+                                  @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password"/>
+                    
+                </MudCardContent>
+                <MudCardActions>
+                    <MudText Class="ml-2" Color="@Color.Error" hidden="@(!isError)" >Invalid password or Username.</MudText>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+            
+        </MudItem>
+        <MudItem xs="3"/>
+    </MudGrid>
+
+</EditForm>
+
+@code {
+    LoginForm model = new LoginForm();
+
+    private bool isError;
+
+    public class LoginForm
+    {
+        [Required]
+        public string Username { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+    }
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        var jwt = AuthenticationService.Login(model.Username, model.Password);
+        if (jwt is null)
+        {
+            isError = true;
+            return;
+        }
+        
+        await ProtectedSessionStore.SetAsync("Jwt", jwt);
+        NavigationManager.NavigateTo("/");
+    }
+
+}
