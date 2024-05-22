@@ -1,0 +1,51 @@
+﻿@page "/Chats"
+@using AskAHuman.Services.Interfaces
+@using DataBaseLayer.DTOs
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject IAuthenticationService AuthenticationService
+@inject IChatService ChatService
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+<h1>Chats</h1>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" hidden="@(!isAuthenticated)" OnClick="@(() => NavigationManager.NavigateTo("/Chats/Create"))">Create New Chat</MudButton>
+@foreach (var chat in currentChats)
+{
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">@(chat.Title.Length > 50 ? chat.Title[..50] + "..." : chat.Title)</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudText>@(chat.Question.Length > 100 ? chat.Question[..100] + "..." : chat.Question)</MudText>
+        </MudCardContent>
+        <MudCardActions>
+            <MudLink Href="@("/Chats/" + chat.id)">Open Chat</MudLink>
+        </MudCardActions>
+    </MudCard>
+}
+
+@code {
+    private List<ChatCardDTO> currentChats = new();
+    private bool isAuthenticated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var jwt = await ProtectedSessionStore.GetAsync<string>("Jwt");
+
+            if (jwt.Success)
+            {
+                var result = AuthenticationService.ValidateJWT(jwt.Value!);
+                isAuthenticated = result.IsSuccess;
+            }
+
+            currentChats = ChatService.GetAllChatsAsCards();
+        }
+        catch (InvalidOperationException) { }
+    }
+
+}
