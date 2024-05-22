@@ -20,6 +20,9 @@ builder.Services.AddTransient<IDbService, DbService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
 builder.Services.AddTransient<IChatService, ChatService>();
+builder.Services.AddTransient<IMessageService, MessageService>();
+builder.Services.AddTransient<ILiveMessageService, LiveMessageService>();
+builder.Services.AddSingleton<ILiveMessageCoordinatorService, LiveMessageCoordinatorService>();
 
 var app = builder.Build();
 
