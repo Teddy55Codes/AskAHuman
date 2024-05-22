@@ -7,8 +7,6 @@
 @inject IAuthenticationService AuthenticationService
 @inject NavigationManager NavigationManager
 
-@rendermode InteractiveServer
-
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <MudGrid Class="mt-1">
         <MudItem xs="3"/>
@@ -30,7 +28,6 @@
         </MudItem>
         <MudItem xs="3"/>
     </MudGrid>
-
 </EditForm>
 
 @code {
