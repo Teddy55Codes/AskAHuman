@@ -1,0 +1,68 @@
+﻿@page "/Chats/Create"
+@using System.ComponentModel.DataAnnotations
+@using AskAHuman.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject IAuthenticationService AuthenticationService
+@inject IChatService ChatService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+<h1 Class="my-2">Create A New Chat</h1>
+
+<MudText Class="my-2">To create a new chat enter your question below.</MudText>
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Label="Question Title" Variant="Variant.Text"
+                          @bind-Value="model.Title" For="@(() => model.Title)"/>
+            <MudTextField Label="Question" Variant="Variant.Text" Lines="15"
+                          @bind-Value="model.Question" For="@(() => model.Question)"/>
+        </MudCardContent>
+        <MudCardActions>
+            <MudCheckBox T="bool" Required="true" RequiredError="You must agree" Label="I confirm that this is a legitimate question which is being submitted with no ill intent."/>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Submit Question</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+    QuestionForm model = new QuestionForm();
+
+    private bool isError;
+
+    public class QuestionForm
+    {
+        [Required]
+        [StringLength(400, ErrorMessage = "Question title must be between 20 and 400 characters long.", MinimumLength = 20)]
+        public string Title { get; set; }
+
+        [Required]
+        [StringLength(2_000, ErrorMessage = "Question must be between 20 and 2,000 characters long.", MinimumLength = 20)]
+        public string Question { get; set; }
+    }
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        if (model.Title.Length is > 400 or < 20) return;
+        if (model.Question.Length is > 2_000 or < 20) return;
+
+        var jwt = await ProtectedSessionStore.GetAsync<string>("Jwt");
+
+        if (jwt.Success)
+        {
+            var result = AuthenticationService.ValidateJWT(jwt.Value!);
+            if (result.IsSuccess)
+            {
+                var chat = ChatService.CreateNewChat(long.Parse(result.Value.Claims.First(c => c.Type == "userId").Value), model.Title, model.Question);
+                NavigationManager.NavigateTo($"/Chats/{chat.Id}");
+                Snackbar.Add("Created New Chat", Severity.Success);
+                return;
+            }
+        }
+
+        Snackbar.Add("You need to be logged in to create questions", Severity.Error);
+    }
+
+}

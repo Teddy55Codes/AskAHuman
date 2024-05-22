@@ -1,0 +1,115 @@
+﻿@using AskAHuman.Services.Interfaces
+@using DataBaseLayer.DTOs
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject IChatService ChatService
+@inject IAuthenticationService AuthenticationService
+@inject IMessageService MessageService
+@inject ILiveMessageService LiveMessageService
+@inject ProtectedSessionStorage ProtectedSessionStore
+@implements IDisposable
+
+@page "/Chats/{chatId:long}"
+
+<MudText Class="ml-2" Color="@Color.Error" hidden="@(!isNotFound)" >Chat does not exist.</MudText>
+
+<MudGrid Class="mt-1" hidden="@isNotFound">
+    
+    <MudCard>
+        <h1>@chat.Title</h1>
+        <MudText>@chat.Question</MudText>
+    </MudCard>
+    
+    @foreach (var message in messages)
+    {
+        <MudCard>
+            <MudText>@message.AuthorName</MudText>
+            <MudText>@message.Message</MudText>
+        </MudCard>
+    }
+
+    <MudCard hidden="@(!isAuthenticated)">
+        <MudCardContent>
+            <MudTextField Label="Message" Variant="Variant.Outlined" @bind-Value="currentMessage"/>
+        </MudCardContent>
+        <MudCardActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="@SendChatMessage" />
+        </MudCardActions>
+    </MudCard>
+</MudGrid>
+
+
+
+@code {
+    [Parameter]
+    public long ChatId { get; set; }
+
+    private bool isFirstRender = true;
+    private bool isNotFound;
+    private bool isAuthenticated;
+    private long userId;
+    private string currentMessage;
+
+    private DatabaseLayer.Entities.Chat? chat;
+    private List<MessageDTO> messages;
+
+    private void SendChatMessage()
+    {
+        if (string.IsNullOrEmpty(currentMessage)) return;
+        LiveMessageService.SendMessageToChat(currentMessage, userId);
+        currentMessage = string.Empty;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (isFirstRender)
+        {
+            chat = ChatService.GetChatById(ChatId);
+            if (chat is null)
+            {
+                isNotFound = true;
+                return;
+            }
+            messages = MessageService.GetMessagesForChatById(ChatId);   
+        }
+        
+        try
+        {
+            var uId = await CheckAuthentication();
+            if (uId is not null)
+            {
+                isAuthenticated = true;
+                userId = (long)uId;
+            }
+        
+            LiveMessageService.SetInformation(ChatId, userId);
+            LiveMessageService.OnMessageReceived += MessageReceived;
+        } catch (InvalidOperationException) { }
+        isFirstRender = false;
+    }
+
+    private void MessageReceived(MessageDTO message)
+    {
+        messages.Add(message);
+        InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task<long?> CheckAuthentication()
+    {
+        var jwt = await ProtectedSessionStore.GetAsync<string>("Jwt");
+        if (jwt.Success)
+        {
+            var result = AuthenticationService.ValidateJWT(jwt.Value!);
+            if (result.IsSuccess)
+            {
+                return long.Parse(result.Value.Claims.First(c => c.Type == "userId").Value);
+            }
+        }
+
+        return null;
+    }
+
+    public void Dispose()
+    {
+        if (LiveMessageService is IDisposable disposable) disposable.Dispose();
+    }
+}
