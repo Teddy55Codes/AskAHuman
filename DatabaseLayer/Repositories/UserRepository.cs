@@ -1,10 +1,11 @@
 ﻿using DatabaseLayer.Entities;
 using DatabaseLayer.Repositories.Base;
+using DataBaseLayer.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataBaseLayer.Repositories;
 
-public class UserRepository : Repository<User>
+public class UserRepository : Repository<User>, IUserRepository
 {
     public UserRepository(DbContext context) : base(context)
     {
