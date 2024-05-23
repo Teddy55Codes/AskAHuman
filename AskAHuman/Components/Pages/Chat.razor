@@ -43,7 +43,6 @@
     [Parameter]
     public long ChatId { get; set; }
 
-    private bool isFirstRender = true;
     private bool isNotFound;
     private bool isAuthenticated;
     private long userId;
@@ -61,17 +60,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (isFirstRender)
+
+        chat = ChatService.GetChatById(ChatId);
+        if (chat is null)
         {
-            chat = ChatService.GetChatById(ChatId);
-            if (chat is null)
-            {
-                isNotFound = true;
-                return;
-            }
-            messages = MessageService.GetMessagesForChatById(ChatId);   
+            isNotFound = true;
+            return;
         }
-        
+        messages = MessageService.GetMessagesForChatById(ChatId);   
+
         try
         {
             var uId = await CheckAuthentication();
@@ -80,11 +77,11 @@
                 isAuthenticated = true;
                 userId = (long)uId;
             }
-        
+
             LiveMessageService.SetInformation(ChatId, userId);
             LiveMessageService.OnMessageReceived += MessageReceived;
-        } catch (InvalidOperationException) { }
-        isFirstRender = false;
+        }
+        catch (InvalidOperationException) { }
     }
 
     private void MessageReceived(MessageDTO message)
