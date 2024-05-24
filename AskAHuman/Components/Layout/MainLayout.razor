@@ -33,7 +33,8 @@
 @code
 {
     private string accountIcon = Icons.Material.Filled.PersonOff;
-    private string accountIconTarget = "/login"; 
+    private string accountIconTarget = "/login";
+    private int userId;
 
     private bool _isAuthenticated;
     
@@ -44,7 +45,7 @@
         {
             _isAuthenticated = value;
             accountIcon = _isAuthenticated ? Icons.Material.Filled.Person : Icons.Material.Filled.PersonOff;
-            accountIconTarget = _isAuthenticated ? "/account" : "/login";
+            accountIconTarget = _isAuthenticated ? $"/account/{userId}" : "/login";
         }
     }
     
@@ -62,6 +63,7 @@
             if (jwt.Success)
             {
                 var result = AuthenticationService.ValidateJWT(jwt.Value!);
+                userId = int.Parse(result.Value.Claims.First(c => c.Type == "userId").Value);
                 IsAuthenticated = result.IsSuccess;
                 StateHasChanged();
             }

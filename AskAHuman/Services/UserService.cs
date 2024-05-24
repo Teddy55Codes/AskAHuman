@@ -25,7 +25,7 @@ public class UserService : IUserService
         return unitOfWork.Users.GetAll().Select(u => new UserDTO(u)).ToList();
     }
 
-    public Result<User> GetById(int id)
+    public Result<User> GetById(long id)
     {
         using var unitOfWork = _dbService.UnitOfWork;
         var user = unitOfWork.Users.GetByPrimaryKey(id);

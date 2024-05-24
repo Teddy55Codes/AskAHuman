@@ -1,0 +1,20 @@
+﻿@page "/Account/{userId:long}"
+
+@using AskAHuman.Services.Interfaces
+@inject IUserService UserService
+
+<h1>@displayText</h1>
+
+@code {
+    [Parameter]
+    public long UserId { get; set; }
+
+    private bool success;
+    private string displayText;
+    
+    protected override void OnInitialized()
+    {
+        var userResult = UserService.GetById(UserId);
+        displayText = userResult.IsSuccess ? userResult.Value.Username : userResult.Errors[0].Message;
+    }
+}
