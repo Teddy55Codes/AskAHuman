@@ -13,28 +13,40 @@
 <MudText Class="ml-2" Color="@Color.Error" hidden="@(!isNotFound)" >Chat does not exist.</MudText>
 
 <MudGrid Class="mt-1" hidden="@isNotFound">
-    
-    <MudCard>
-        <h1>@chat.Title</h1>
-        <MudText>@chat.Question</MudText>
-    </MudCard>
-    
-    @foreach (var message in messages)
-    {
-        <MudCard>
-            <MudText>@message.AuthorName</MudText>
-            <MudText>@message.Message</MudText>
+    <MudItem xs="12">
+        <MudCard Elevation="2" Class="pa-2">
+            <h1 Class="mx-3 my-6">@chat.Title</h1>
+            <MudText Class="ma-6 flex-wrap">@chat.Question</MudText>
         </MudCard>
-    }
-
-    <MudCard hidden="@(!isAuthenticated)">
-        <MudCardContent>
-            <MudTextField Label="Message" Variant="Variant.Outlined" @bind-Value="currentMessage"/>
-        </MudCardContent>
-        <MudCardActions>
-            <MudIconButton Icon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="@SendChatMessage" />
-        </MudCardActions>
-    </MudCard>
+    </MudItem>
+    <MudItem xs="12">
+        @foreach (var message in messages)
+        {
+            <MudCard Class="pa-1 my-2" Elevation="2">
+                <h3 Class="mx-3 mb-6 mt-3">@message.AuthorName</h3>
+                <MudText Class="mx-3 my-3">@message.Message</MudText>
+            </MudCard>
+        }
+    </MudItem>
+    <MudItem xs="12" Elevation="2">
+        <MudCard hidden="@(!isAuthenticated)">
+            <EditForm Model="@model" OnValidSubmit="SendChatMessage">
+            <DataAnnotationsValidator/>
+                <MudGrid Class="align-center">
+                    <MudItem xs="11">
+                        <MudCardContent>
+                            <MudTextField Label="Message" Variant="Variant.Outlined" @bind-Value="model.message" For="@(() => model.message)"/>
+                        </MudCardContent>
+                    </MudItem>
+                    <MudItem xs="1">
+                        <MudCardActions>
+                            <MudIconButton Icon="@Icons.Material.Filled.Send" Color="Color.Primary" ButtonType="ButtonType.Submit"/>
+                        </MudCardActions>
+                    </MudItem>
+                </MudGrid>
+            </EditForm>
+        </MudCard>
+    </MudItem>
 </MudGrid>
 
 
@@ -42,6 +54,8 @@
 @code {
     [Parameter]
     public long ChatId { get; set; }
+    
+    public TextMessage model = new();
 
     private bool isNotFound;
     private bool isAuthenticated;
@@ -51,11 +65,16 @@
     private DatabaseLayer.Entities.Chat? chat;
     private List<MessageDTO> messages;
 
+    public class TextMessage
+    {
+        public string message { get; set; }
+    }
+    
     private void SendChatMessage()
     {
-        if (string.IsNullOrEmpty(currentMessage)) return;
-        LiveMessageService.SendMessageToChat(currentMessage, userId);
-        currentMessage = string.Empty;
+        if (string.IsNullOrEmpty(model.message)) return;
+        LiveMessageService.SendMessageToChat(model.message, userId);
+        model = new();
     }
 
     protected override async Task OnInitializedAsync()

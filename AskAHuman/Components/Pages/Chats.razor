@@ -9,17 +9,17 @@
 
 <h1>Chats</h1>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" hidden="@(!isAuthenticated)" OnClick="@(() => NavigationManager.NavigateTo("/Chats/Create"))">Create New Chat</MudButton>
+<MudButton Class="my-3" Variant="Variant.Filled" Color="Color.Primary" hidden="@(!isAuthenticated)" OnClick="@(() => NavigationManager.NavigateTo("/Chats/Create"))">Create New Chat</MudButton>
 @foreach (var chat in currentChats)
 {
-    <MudCard>
+    <MudCard Class="my-3" Elevation="2">
         <MudCardHeader>
             <CardHeaderContent>
-                <MudText Typo="Typo.h6">@(chat.Title.Length > 50 ? chat.Title[..50] + "..." : chat.Title)</MudText>
+                <MudText Class="flex-wrap" Typo="Typo.h6">@(chat.Title.Length > 50 ? chat.Title[..50] + "..." : chat.Title)</MudText>
             </CardHeaderContent>
         </MudCardHeader>
         <MudCardContent>
-            <MudText>@(chat.Question.Length > 100 ? chat.Question[..100] + "..." : chat.Question)</MudText>
+            <MudText Class="flex-wrap">@(chat.Question.Length > 100 ? chat.Question[..100] + "..." : chat.Question)</MudText>
         </MudCardContent>
         <MudCardActions>
             <MudLink Href="@("/Chats/" + chat.id)">Open Chat</MudLink>
