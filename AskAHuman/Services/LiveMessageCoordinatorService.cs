@@ -60,5 +60,6 @@ public class LiveMessageCoordinatorService : ILiveMessageCoordinatorService
             AuthorId = authorId,
             ChatId = chatId
         });
+        uow.Commit();
     }
 }
