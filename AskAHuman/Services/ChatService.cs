@@ -32,10 +32,17 @@ public class ChatService : IChatService
     }
 
     /// <inheritdoc />
-    public List<ChatCardDTO> GetUsersChatsAsCards(long userId)
+    public List<ChatCardDTO> GetUsersActiveChatsAsCards(long userId)
     {
         using var uow = _dbService.UnitOfWork;
-        return uow.Chats.GetChatsRelatedToUser(userId).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question)).ToList();
+        return uow.Chats.GetChatsRelatedToUser(userId).Where(c => c.Completed == 0).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question)).ToList();
+    }
+
+    /// <inheritdoc />
+    public List<ChatCardDTO> GetUsersCompletedChatsAsCards(long userId)
+    {
+        using var uow = _dbService.UnitOfWork;
+        return uow.Chats.GetChatsRelatedToUser(userId).Where(c => c.Completed == 1).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question)).ToList();
     }
 
     /// <inheritdoc />

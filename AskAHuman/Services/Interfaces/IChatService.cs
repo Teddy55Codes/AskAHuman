@@ -19,11 +19,18 @@ public interface IChatService
     public List<ChatCardDTO> GetUnansweredChatsAsCards();
     
     /// <summary>
-    /// Gets all chats from a user formatted for chat cards.
+    /// Gets all active chats from a user formatted for chat cards.
     /// </summary>
-    /// <param name="userId">The user to get the chats for..</param>
+    /// <param name="userId">The user to get the chats for.</param>
     /// <returns>chats as <see cref="ChatCardDTO"/>.</returns>
-    public List<ChatCardDTO> GetUsersChatsAsCards(long userId);
+    public List<ChatCardDTO> GetUsersActiveChatsAsCards(long userId);
+    
+    /// <summary>
+    /// Gets all completed chats from a user formatted for chat cards.
+    /// </summary>
+    /// <param name="userId">The user to get the chats for.</param>
+    /// <returns>chats as <see cref="ChatCardDTO"/>.</returns>
+    public List<ChatCardDTO> GetUsersCompletedChatsAsCards(long userId);
     
     /// <summary>
     /// Creates a new chat.
