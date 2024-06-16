@@ -25,6 +25,20 @@ public class ChatService : IChatService
     }
 
     /// <inheritdoc />
+    public List<ChatCardDTO> GetUnansweredChatsAsCards()
+    {
+        using var uow = _dbService.UnitOfWork;
+        return uow.Chats.GetUnansweredChats().Select(c => new ChatCardDTO(c.Id, c.Title, c.Question)).ToList();
+    }
+
+    /// <inheritdoc />
+    public List<ChatCardDTO> GetUsersChatsAsCards(long userId)
+    {
+        using var uow = _dbService.UnitOfWork;
+        return uow.Chats.GetChatsRelatedToUser(userId).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question)).ToList();
+    }
+
+    /// <inheritdoc />
     public Result<Chat> CreateNewChat(long userId, string title, string question)
     {
         using var unitOfWork = _dbService.UnitOfWork;
