@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `askahuman`.`users` (
     `PasswordHash` TEXT NOT NULL,
     `PasswordSalt` TEXT NOT NULL,
     `Reputation` BIGINT(20) NOT NULL DEFAULT 0,
-    `CreatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    `CreatedAt` DATETIME NOT NULL DEFAULT UTC_TIMESTAMP(),
     PRIMARY KEY (`Id`))
     ENGINE = InnoDB
     AUTO_INCREMENT = 20
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `askahuman`.`chats` (
     `Id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `UsersAnswererId` BIGINT(20) NULL,
     `UsersQuestioningId` BIGINT(20) NOT NULL,
-    `CreatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    `CreatedAt` DATETIME NOT NULL DEFAULT UTC_TIMESTAMP(),
     `AnswererJoinedAt` DATETIME NULL,
     `Completed` TINYINT(4) NOT NULL DEFAULT 0,
     `Title` TEXT NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `askahuman`.`messages` (
     `Id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `ChatId` BIGINT(20) NOT NULL,
     `Content` TEXT NOT NULL,
-    `CreatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    `CreatedAt` DATETIME NOT NULL DEFAULT UTC_TIMESTAMP(),
     `AuthorId` BIGINT(20) NOT NULL,
     PRIMARY KEY (`Id`, `ChatId`),
     INDEX `fk_Messages_Chats1_idx` (`ChatId` ASC) VISIBLE,
