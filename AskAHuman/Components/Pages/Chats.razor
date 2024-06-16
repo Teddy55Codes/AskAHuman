@@ -9,7 +9,7 @@
 
 <h1>Chats</h1>
 
-<MudButton Class="my-3" Variant="Variant.Filled" Color="Color.Primary" hidden="@(AuthenticationService.AuthenticatedUser == null)" OnClick="@(() => NavigationManager.NavigateTo("/Chats/Create"))">Create New Chat</MudButton>
+<MudButton Class="my-3" Variant="Variant.Filled" Color="Color.Primary" hidden="@(AuthenticationService.AuthenticatedUser is null)" OnClick="@(() => NavigationManager.NavigateTo("/Chats/Create"))">Create New Chat</MudButton>
 @foreach (var chat in currentChats)
 {
     <MudCard Class="my-3" Elevation="2">
@@ -32,7 +32,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (AuthenticationService.AuthenticatedUser == null)
+        if (AuthenticationService.AuthenticatedUser is null)
         {
             await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage);
         }

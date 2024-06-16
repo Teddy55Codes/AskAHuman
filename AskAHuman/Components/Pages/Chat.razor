@@ -6,6 +6,8 @@
 @inject IMessageService MessageService
 @inject ILiveMessageService LiveMessageService
 @inject ProtectedLocalStorage ProtectedLocalStorage
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
 @implements IDisposable
 
 @page "/Chats/{chatId:long}"
@@ -13,25 +15,40 @@
 <MudText Class="ml-2" Color="@Color.Error" hidden="@(!isNotFound)" >Chat does not exist.</MudText>
 
 <MudGrid Class="mt-1" hidden="@isNotFound">
+    <MudCard Class="ml-3" hidden="@(chat.UsersAnswererId is not null ||
+    AuthenticationService.AuthenticatedUser is null ||
+    AuthenticationService.AuthenticatedUser == chat.UsersQuestioningId)">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="JoinChat">Join as Answerer</MudButton>
+    </MudCard>
     <MudItem xs="12">
         <MudCard Elevation="2" Class="pa-2">
             <h1 Class="mx-3 my-6">@chat.Title</h1>
             <MudText Class="ma-6 flex-wrap">@chat.Question</MudText>
         </MudCard>
     </MudItem>
-    <MudItem xs="12">
+    <MudItem Class="d-flex" xs="12">
         @foreach (var message in messages)
         {
-            <MudCard Class="pa-1 my-2" Elevation="2">
-                <h3 Class="mx-3 mb-6 mt-3">@message.AuthorName</h3>
-                <MudText Class="mx-3 my-3">@message.Message</MudText>
-            </MudCard>
+            @if (message.AuthorId == AuthenticationService.AuthenticatedUser)
+            {
+                <MudCard Class="align-self-end pa-1 my-2" Elevation="2">
+                    <h3 Class="mx-3 mb-6 mt-3">@message.AuthorName</h3>
+                    <MudText Class="mx-3 my-3">@message.Message</MudText>
+                </MudCard>
+            }
+            else
+            {
+                <MudCard Class="align-self-start pa-1 my-2" Elevation="2">
+                    <h3 Class="mx-3 mb-6 mt-3">@message.AuthorName</h3>
+                    <MudText Class="mx-3 my-3">@message.Message</MudText>
+                </MudCard>
+            }
         }
     </MudItem>
     <MudItem xs="12" Elevation="2">
-        <MudCard hidden="@(AuthenticationService.AuthenticatedUser == null)">
+        <MudCard hidden="@(AuthenticationService.AuthenticatedUser is null || (AuthenticationService.AuthenticatedUser != chat.UsersAnswererId && AuthenticationService.AuthenticatedUser != chat.UsersQuestioningId))">
             <EditForm Model="@model" OnValidSubmit="SendChatMessage">
-            <DataAnnotationsValidator/>
+                <DataAnnotationsValidator/>
                 <MudGrid Class="align-center">
                     <MudItem xs="11">
                         <MudCardContent>
@@ -58,7 +75,6 @@
     public TextMessage model = new();
 
     private bool isNotFound;
-    private bool isAuthenticated;
     private string currentMessage;
 
     private DatabaseLayer.Entities.Chat? chat;
@@ -71,9 +87,31 @@
     
     private void SendChatMessage()
     {
-        if (string.IsNullOrEmpty(model.message) || AuthenticationService.AuthenticatedUser == null) return;
+        if (string.IsNullOrEmpty(model.message) || AuthenticationService.AuthenticatedUser is null) return;
         LiveMessageService.SendMessageToChat(model.message, (long)AuthenticationService.AuthenticatedUser);
         model = new();
+    }
+
+    private void JoinChat()
+    {
+        chat = ChatService.GetChatById(ChatId);
+
+
+        if (chat.UsersAnswererId is not null ||
+            AuthenticationService.AuthenticatedUser is null ||
+            AuthenticationService.AuthenticatedUser == chat.UsersQuestioningId) return;
+        var result = ChatService.ClaimChat((long)AuthenticationService.AuthenticatedUser, ChatId);
+        if (result.IsSuccess)
+        {
+            NavigationManager.Refresh(true);
+        }
+        else
+        {
+            foreach (var error in result.Errors)
+            {
+                Snackbar.Add(error.Message, Severity.Error);
+            }
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -86,7 +124,7 @@
         }
         messages = MessageService.GetMessagesForChatById(ChatId);   
         
-        if (AuthenticationService.AuthenticatedUser != null || await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage))
+        if (AuthenticationService.AuthenticatedUser is not null || await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage))
         {
             StateHasChanged();
             

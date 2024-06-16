@@ -55,7 +55,7 @@
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
-        if (AuthenticationService.AuthenticatedUser != null || await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage))
+        if (AuthenticationService.AuthenticatedUser is not null || await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage))
         {
             IsAuthenticated = true;
             StateHasChanged();

@@ -46,7 +46,7 @@
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
-        if (AuthenticationService.AuthenticatedUser == null)
+        if (AuthenticationService.AuthenticatedUser is null)
         {
             await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage);
         }
@@ -57,11 +57,22 @@
         if (model.Title.Length is > 400 or < 20) return;
         if (model.Question.Length is > 2_000 or < 20) return;
 
-        if (AuthenticationService.AuthenticatedUser != null)
+        if (AuthenticationService.AuthenticatedUser is not null)
         {
             var chat = ChatService.CreateNewChat((long)AuthenticationService.AuthenticatedUser, model.Title, model.Question);
-            NavigationManager.NavigateTo($"/Chats/{chat.Id}");
-            Snackbar.Add("Created New Chat", Severity.Success);
+            if (chat.IsSuccess)
+            {
+                NavigationManager.NavigateTo($"/Chats/{chat.Value.Id}");
+                Snackbar.Add("Created New Chat", Severity.Success);
+            }
+            else
+            {
+                foreach (var error in chat.Errors)
+                {
+                    Snackbar.Add(error.Message, Severity.Error);
+                }
+            }
+            
             return;
         }
         Snackbar.Add("You need to be logged in to create questions", Severity.Error);

@@ -2,15 +2,18 @@
 using DatabaseLayer;
 using DataBaseLayer.DTOs;
 using DatabaseLayer.Entities;
+using FluentResults;
 
 namespace AskAHuman.Services;
 
 public class ChatService : IChatService
 {
+    private readonly IConfiguration _configuration;
     private readonly IDbService _dbService;
     
-    public ChatService(IDbService dbService)
+    public ChatService(IConfiguration configuration, IDbService dbService)
     {
+        _configuration = configuration;
         _dbService = dbService;
     }
     
@@ -22,9 +25,18 @@ public class ChatService : IChatService
     }
 
     /// <inheritdoc />
-    public Chat CreateNewChat(long userId, string title, string question)
+    public Result<Chat> CreateNewChat(long userId, string title, string question)
     {
-        using var uow = _dbService.UnitOfWork;
+        using var unitOfWork = _dbService.UnitOfWork;
+        var user = unitOfWork.Users.GetByPrimaryKey(userId);
+        if (user is null) return Result.Fail("User does not exist.");
+        
+        if (int.TryParse(_configuration["Administration:MaxActiveQuestions"], out var maxActiveQuestions) &&
+            user.ChatUsersQuestionings.Count >= maxActiveQuestions)
+        {
+            return Result.Fail($"Maximum active questions reached. You can only have {maxActiveQuestions} active questions.");
+        }
+        
         var newChat = new Chat
         {
             UsersAnswererId = null,
@@ -32,10 +44,33 @@ public class ChatService : IChatService
             Title = title,
             Question = question
         };
-        var chat = uow.Chats.Add(newChat);
+        var chat = unitOfWork.Chats.Add(newChat);
         
-        uow.Commit();
+        unitOfWork.Commit();
         return chat;
+    }
+
+    /// <inheritdoc />
+    public Result<Chat> ClaimChat(long userId, long chatId)
+    {
+        using var unitOfWork = _dbService.UnitOfWork;
+        var user = unitOfWork.Users.GetByPrimaryKey(userId);
+        if (user is null) return Result.Fail("User does not exist.");
+        
+        if (int.TryParse(_configuration["Administration:MaxActiveAnswers"], out var maxActiveAnswers) &&
+            user.ChatUsersAnswerers.Count >= maxActiveAnswers)
+        {
+            return Result.Fail($"Maximum active answers reached. You can only have {maxActiveAnswers} active answers.");
+        }
+        
+        var chat = unitOfWork.Chats.GetByPrimaryKey(chatId);
+        if (chat is null) return Result.Fail("Chat does not exist.");
+        if (chat.UsersAnswererId is not null) return Result.Fail("Chat already has an answerer.");
+        
+        chat.UsersAnswererId = userId;
+        unitOfWork.Commit();
+        return Result.Ok(chat);
+
     }
 
     /// <inheritdoc />

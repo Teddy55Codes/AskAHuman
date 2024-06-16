@@ -10,4 +10,11 @@ public class ChatRepository : Repository<Chat>, IChatRepository
     public ChatRepository(DbContext context) : base(context)
     {
     }
+    
+    public List<Chat> GetQuestionsByUser(long userId) => _context.Set<Chat>().Where(c => c.UsersQuestioningId == userId).ToList();
+    public List<Chat> GetAnswersByUser(long userId) => _context.Set<Chat>().Where(c => c.UsersAnswererId == userId).ToList();
+    
+    public List<Chat> GetActiveQuestionsByUser(long userId) => _context.Set<Chat>().Where(c => c.Completed == 0 && c.UsersQuestioningId == userId).ToList();
+    public List<Chat> GetActiveAnswersByUser(long userId) => _context.Set<Chat>().Where(c => c.Completed == 0 && c.UsersAnswererId == userId).ToList();
+
 }

@@ -1,5 +1,6 @@
 ﻿using DataBaseLayer.DTOs;
 using DatabaseLayer.Entities;
+using FluentResults;
 
 namespace AskAHuman.Services.Interfaces;
 
@@ -17,8 +18,16 @@ public interface IChatService
     /// <param name="userId">The user who creates the chat.</param>
     /// <param name="title">The title of the chat.</param>
     /// <param name="question">The question being asked in the chat.</param>
-    /// <returns>The new chat.</returns>
-    public Chat CreateNewChat(long userId, string title, string question);
+    /// <returns>The result for the new chat.</returns>
+    public  Result<Chat> CreateNewChat(long userId, string title, string question);
+
+    /// <summary>
+    /// User sets themselves as the answerer of a chat. 
+    /// </summary>
+    /// <param name="userId">The user to set as <see cref="Chat.UsersAnswerer"/>.</param>
+    /// <param name="chatId">The chat to set the <see cref="Chat.UsersAnswerer"/> on.</param>
+    /// <returns>The result for the claimed chat.</returns>
+    public Result<Chat> ClaimChat(long userId, long chatId);
 
     /// <summary>
     /// Gets a chat by id.

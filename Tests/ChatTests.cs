@@ -4,6 +4,7 @@ using DatabaseLayer;
 using DatabaseLayer.Entities;
 using DataBaseLayer.Repositories.Interfaces;
 using DatabaseLayer.UnitOfWork;
+using Microsoft.Extensions.Configuration;
 using NSubstitute;
 
 namespace Tests;
@@ -14,17 +15,19 @@ public class ChatTests
     private readonly IUnitOfWork _unitOfWork;
     private readonly IChatRepository _chatRepository;
     private readonly IChatService _chatService;
+    private readonly IConfiguration _configuration;
 
     public ChatTests()
     {
         _dbService = Substitute.For<IDbService>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
         _chatRepository = Substitute.For<IChatRepository>();
+        _configuration = Substitute.For<IConfiguration>();
         
         _dbService.UnitOfWork.Returns(_unitOfWork);
         _unitOfWork.Chats.Returns(_chatRepository);
 
-        _chatService = new ChatService(_dbService);
+        _chatService = new ChatService(_configuration, _dbService);
     }
 
     [Fact]
@@ -63,9 +66,10 @@ public class ChatTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("New Chat", result.Title);
-        Assert.Equal("New Question", result.Question);
-        Assert.Equal(1, result.UsersQuestioningId);
+        Assert.True(result.IsSuccess);
+        Assert.Equal("New Chat", result.Value.Title);
+        Assert.Equal("New Question", result.Value.Question);
+        Assert.Equal(1, result.Value.UsersQuestioningId);
         _unitOfWork.Received(1).Commit();
     }
 
