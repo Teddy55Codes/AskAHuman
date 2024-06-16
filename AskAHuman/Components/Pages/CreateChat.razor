@@ -6,7 +6,7 @@
 @inject IChatService ChatService
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
-@inject ProtectedSessionStorage ProtectedSessionStore
+@inject ProtectedLocalStorage ProtectedLocalStorage
 
 <h1 Class="my-2">Create A New Chat</h1>
 
@@ -43,25 +43,27 @@
         public string Question { get; set; }
     }
 
-    private async Task OnValidSubmit(EditContext context)
+    /// <inheritdoc />
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationService.AuthenticatedUser == null)
+        {
+            await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage);
+        }
+    }
+
+    private void OnValidSubmit(EditContext context)
     {
         if (model.Title.Length is > 400 or < 20) return;
         if (model.Question.Length is > 2_000 or < 20) return;
 
-        var jwt = await ProtectedSessionStore.GetAsync<string>("Jwt");
-
-        if (jwt.Success)
+        if (AuthenticationService.AuthenticatedUser != null)
         {
-            var result = AuthenticationService.ValidateJWT(jwt.Value!);
-            if (result.IsSuccess)
-            {
-                var chat = ChatService.CreateNewChat(long.Parse(result.Value.Claims.First(c => c.Type == "userId").Value), model.Title, model.Question);
-                NavigationManager.NavigateTo($"/Chats/{chat.Id}");
-                Snackbar.Add("Created New Chat", Severity.Success);
-                return;
-            }
+            var chat = ChatService.CreateNewChat((long)AuthenticationService.AuthenticatedUser, model.Title, model.Question);
+            NavigationManager.NavigateTo($"/Chats/{chat.Id}");
+            Snackbar.Add("Created New Chat", Severity.Success);
+            return;
         }
-
         Snackbar.Add("You need to be logged in to create questions", Severity.Error);
     }
 

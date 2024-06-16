@@ -5,7 +5,7 @@
 @inject IAuthenticationService AuthenticationService
 @inject IMessageService MessageService
 @inject ILiveMessageService LiveMessageService
-@inject ProtectedSessionStorage ProtectedSessionStore
+@inject ProtectedLocalStorage ProtectedLocalStorage
 @implements IDisposable
 
 @page "/Chats/{chatId:long}"
@@ -29,7 +29,7 @@
         }
     </MudItem>
     <MudItem xs="12" Elevation="2">
-        <MudCard hidden="@(!isAuthenticated)">
+        <MudCard hidden="@(AuthenticationService.AuthenticatedUser == null)">
             <EditForm Model="@model" OnValidSubmit="SendChatMessage">
             <DataAnnotationsValidator/>
                 <MudGrid Class="align-center">
@@ -59,7 +59,6 @@
 
     private bool isNotFound;
     private bool isAuthenticated;
-    private long userId;
     private string currentMessage;
 
     private DatabaseLayer.Entities.Chat? chat;
@@ -72,14 +71,13 @@
     
     private void SendChatMessage()
     {
-        if (string.IsNullOrEmpty(model.message)) return;
-        LiveMessageService.SendMessageToChat(model.message, userId);
+        if (string.IsNullOrEmpty(model.message) || AuthenticationService.AuthenticatedUser == null) return;
+        LiveMessageService.SendMessageToChat(model.message, (long)AuthenticationService.AuthenticatedUser);
         model = new();
     }
 
     protected override async Task OnInitializedAsync()
     {
-
         chat = ChatService.GetChatById(ChatId);
         if (chat is null)
         {
@@ -87,41 +85,20 @@
             return;
         }
         messages = MessageService.GetMessagesForChatById(ChatId);   
-
-        try
+        
+        if (AuthenticationService.AuthenticatedUser != null || await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage))
         {
-            var uId = await CheckAuthentication();
-            if (uId is not null)
-            {
-                isAuthenticated = true;
-                userId = (long)uId;
-            }
-
-            LiveMessageService.SetInformation(ChatId, userId);
+            StateHasChanged();
+            
+            LiveMessageService.SetInformation(ChatId, (long)AuthenticationService.AuthenticatedUser);
             LiveMessageService.OnMessageReceived += MessageReceived;
         }
-        catch (InvalidOperationException) { }
     }
 
     private void MessageReceived(MessageDTO message)
     {
         messages.Add(message);
         InvokeAsync(StateHasChanged);
-    }
-    
-    private async Task<long?> CheckAuthentication()
-    {
-        var jwt = await ProtectedSessionStore.GetAsync<string>("Jwt");
-        if (jwt.Success)
-        {
-            var result = AuthenticationService.ValidateJWT(jwt.Value!);
-            if (result.IsSuccess)
-            {
-                return long.Parse(result.Value.Claims.First(c => c.Type == "userId").Value);
-            }
-        }
-
-        return null;
     }
 
     public void Dispose()

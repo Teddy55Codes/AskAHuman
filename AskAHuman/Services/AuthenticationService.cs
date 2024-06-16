@@ -6,6 +6,7 @@ using AskAHuman.Services.Interfaces;
 using DatabaseLayer;
 using DatabaseLayer.Entities;
 using FluentResults;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AskAHuman.Services;
@@ -49,6 +50,28 @@ public class AuthenticationService : IAuthenticationService
         });
         unitOfWork.Commit();
         return true;
+    }
+    
+    /// <inheritdoc />
+    public async Task<bool> AuthenticateViaLocalStorage(ProtectedLocalStorage protectedLocalStorage)
+    {
+        try
+        {
+            var jwt = await protectedLocalStorage.GetAsync<string>("Jwt");
+        
+            if (jwt.Success)
+            {
+                var result = ValidateJWT(jwt.Value!);
+                if (int.TryParse(result.Value.Claims.FirstOrDefault(c => c.Type == "userId")?.Value, out var userId))
+                {
+                    AuthenticatedUser = userId;
+                    return true;
+                }
+                
+            }
+        } catch (InvalidOperationException) {}
+
+        return false;
     }
     
     /// <inheritdoc />

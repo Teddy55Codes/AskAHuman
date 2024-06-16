@@ -5,11 +5,11 @@
 @inject IAuthenticationService AuthenticationService
 @inject IChatService ChatService
 @inject NavigationManager NavigationManager
-@inject ProtectedSessionStorage ProtectedSessionStore
+@inject ProtectedLocalStorage ProtectedLocalStorage
 
 <h1>Chats</h1>
 
-<MudButton Class="my-3" Variant="Variant.Filled" Color="Color.Primary" hidden="@(!isAuthenticated)" OnClick="@(() => NavigationManager.NavigateTo("/Chats/Create"))">Create New Chat</MudButton>
+<MudButton Class="my-3" Variant="Variant.Filled" Color="Color.Primary" hidden="@(AuthenticationService.AuthenticatedUser == null)" OnClick="@(() => NavigationManager.NavigateTo("/Chats/Create"))">Create New Chat</MudButton>
 @foreach (var chat in currentChats)
 {
     <MudCard Class="my-3" Elevation="2">
@@ -29,23 +29,15 @@
 
 @code {
     private List<ChatCardDTO> currentChats = new();
-    private bool isAuthenticated;
 
     protected override async Task OnInitializedAsync()
     {
-        try
+        if (AuthenticationService.AuthenticatedUser == null)
         {
-            var jwt = await ProtectedSessionStore.GetAsync<string>("Jwt");
-
-            if (jwt.Success)
-            {
-                var result = AuthenticationService.ValidateJWT(jwt.Value!);
-                isAuthenticated = result.IsSuccess;
-            }
-
-            currentChats = ChatService.GetAllChatsAsCards();
+            await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage);
         }
-        catch (InvalidOperationException) { }
+        
+        currentChats = ChatService.GetAllChatsAsCards();
     }
 
 }

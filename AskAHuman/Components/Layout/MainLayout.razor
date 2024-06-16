@@ -1,7 +1,7 @@
 ﻿@using AskAHuman.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inherits LayoutComponentBase
-@inject ProtectedSessionStorage ProtectedSessionStore
+@inject ProtectedLocalStorage ProtectedLocalStorage
 @inject IAuthenticationService AuthenticationService
 
 <MudThemeProvider IsDarkMode="true"/>
@@ -34,7 +34,6 @@
 {
     private string accountIcon = Icons.Material.Filled.PersonOff;
     private string accountIconTarget = "/login";
-    private int userId;
 
     private bool _isAuthenticated;
     
@@ -45,7 +44,7 @@
         {
             _isAuthenticated = value;
             accountIcon = _isAuthenticated ? Icons.Material.Filled.Person : Icons.Material.Filled.PersonOff;
-            accountIconTarget = _isAuthenticated ? $"/account/{userId}" : "/login";
+            accountIconTarget = _isAuthenticated ? $"/account/{AuthenticationService.AuthenticatedUser}" : "/login";
         }
     }
     
@@ -56,32 +55,10 @@
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
-        try
+        if (AuthenticationService.AuthenticatedUser != null || await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage))
         {
-            var jwt = await ProtectedSessionStore.GetAsync<string>("Jwt");
-        
-            if (jwt.Success)
-            {
-                var result = AuthenticationService.ValidateJWT(jwt.Value!);
-                userId = int.Parse(result.Value.Claims.First(c => c.Type == "userId").Value);
-                IsAuthenticated = result.IsSuccess;
-                StateHasChanged();
-            }
-        } catch (InvalidOperationException) {}
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-        {
-            var jwt = await ProtectedSessionStore.GetAsync<string>("Jwt");
-        
-            if (jwt.Success)
-            {
-                var result = AuthenticationService.ValidateJWT(jwt.Value!);
-                IsAuthenticated = result.IsSuccess;
-                StateHasChanged();
-            }
+            IsAuthenticated = true;
+            StateHasChanged();
         }
     }
 }

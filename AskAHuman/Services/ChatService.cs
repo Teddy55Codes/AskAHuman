@@ -14,12 +14,14 @@ public class ChatService : IChatService
         _dbService = dbService;
     }
     
+    /// <inheritdoc />
     public List<ChatCardDTO> GetAllChatsAsCards()
     {
         using var uow = _dbService.UnitOfWork;
         return uow.Chats.GetAll().Select(c => new ChatCardDTO(c.Id, c.Title, c.Question)).ToList();
     }
 
+    /// <inheritdoc />
     public Chat CreateNewChat(long userId, string title, string question)
     {
         using var uow = _dbService.UnitOfWork;
@@ -36,6 +38,7 @@ public class ChatService : IChatService
         return chat;
     }
 
+    /// <inheritdoc />
     public Chat? GetChatById(long chatId)
     {
         using var uow = _dbService.UnitOfWork;

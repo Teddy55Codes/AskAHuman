@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using FluentResults;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace AskAHuman.Services.Interfaces;
 
@@ -12,7 +13,7 @@ public interface IAuthenticationService
     public long? AuthenticatedUser { get; set; }
     
     /// <summary>
-    /// Used to Login a user.
+    /// Used to Log in a user.
     /// </summary>
     /// <param name="username">The username of the user to login.</param>
     /// <param name="password">The password of the user to login.</param>
@@ -27,6 +28,12 @@ public interface IAuthenticationService
     /// <returns></returns>
     public bool Register(string username, string password);
 
+    /// <summary>
+    /// Authenticates a user via the browsers local storage
+    /// </summary>
+    /// <returns>Is the user authenticated.</returns>
+    public Task<bool> AuthenticateViaLocalStorage(ProtectedLocalStorage protectedLocalStorage);
+    
     /// <summary>
     /// Used to validate a jwt token.
     /// </summary>
