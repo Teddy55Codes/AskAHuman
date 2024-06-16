@@ -1,0 +1,29 @@
+﻿version: '3.8'
+
+services:
+  askahuman:
+    build:
+      context: .
+      dockerfile: AskAHuman/Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - "ASPNETCORE_ENVIRONMENT=Development"
+      - "ASPNETCORE_URLS=http://+:80"
+      - "ConnectionStrings:MariaDB=server=database;port=3306;database=askahuman;user=root;password=sml12345"
+    depends_on:
+      database:
+        condition: service_healthy
+  database:
+    image: mariadb:11.1.4
+    ports:
+      - "3306"
+    environment:
+      - "MARIADB_ROOT_PASSWORD=sml12345"
+    volumes:
+      - /backup-volume:/backup
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb -h 127.0.0.1 -u root --password=sml12345 -e 'SELECT 1'"]
+      interval: 2s
+      timeout: 5s
+      retries: 20

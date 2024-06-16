@@ -4,6 +4,7 @@ using AskAHuman.Services.Interfaces;
 using DatabaseLayer;
 using DatabaseLayer.Context;
 using DatabaseLayer.UnitOfWork;
+using Microsoft.AspNetCore.DataProtection;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,17 +25,23 @@ builder.Services.AddTransient<IMessageService, MessageService>();
 builder.Services.AddTransient<ILiveMessageService, LiveMessageService>();
 builder.Services.AddSingleton<ILiveMessageCoordinatorService, LiveMessageCoordinatorService>();
 
+if (builder.Environment.IsProduction())
+{
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo("/DataProtection-Keys"))
+        .SetApplicationName("AskAHuman");
+}
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();

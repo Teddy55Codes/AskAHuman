@@ -16,7 +16,15 @@ public partial class AskAHumanDbContext(IConfiguration configuration) : DbContex
 
     public virtual DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseMySql(configuration?.GetConnectionString("MariaDB"), ServerVersion.Parse("11.1.4-mariadb"));
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => 
+        optionsBuilder.UseMySql(
+            configuration?.GetConnectionString("MariaDB"), 
+            ServerVersion.AutoDetect(configuration?.GetConnectionString("MariaDB")),
+            options => options.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(15),
+                errorNumbersToAdd: null
+                ));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,0 +1,36 @@
+﻿version: '3.8'
+
+services:
+  askahuman:
+    build:
+      context: .
+      dockerfile: AskAHuman/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - "ASPNETCORE_ENVIRONMENT=Production"
+      - "ASPNETCORE_URLS=https://+:443;http://+:80"
+      - "ASPNETCORE_Kestrel__Certificates__Default__Password=sml12345"
+      - "ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnet.pfx"
+      - "ConnectionStrings:MariaDB=server=database;port=3306;database=askahuman;user=root;password=sml12345"
+    volumes:
+      - ~/.aspnet/https:/https:ro
+      - ./dataprotection-keys:/DataProtection-Keys
+
+    depends_on:
+      database:
+        condition: service_healthy
+  database:
+    image: mariadb:11.1.4
+    ports:
+      - "3306"
+    environment:
+      - "MARIADB_ROOT_PASSWORD=sml12345"
+    volumes:
+      - /backup-volume:/backup
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb -h 127.0.0.1 -u root --password=sml12345 -e 'SELECT 1'"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
