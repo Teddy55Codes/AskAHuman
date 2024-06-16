@@ -20,8 +20,7 @@ builder.Services.AddJsEngineSwitcher(options =>
         options.AllowCurrentProperty = false;
         options.DefaultEngineName = V8JsEngine.EngineName;
     })
-    .AddV8()
-    ;
+    .AddV8();
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
