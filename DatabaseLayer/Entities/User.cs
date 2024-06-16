@@ -15,6 +15,8 @@ public partial class User
 
     public long Reputation { get; set; }
 
+    public bool IsOnline { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime LastOnlineAt { get; set; }

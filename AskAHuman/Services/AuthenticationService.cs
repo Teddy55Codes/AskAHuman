@@ -21,18 +21,19 @@ public class AuthenticationService : IAuthenticationService
         _dbService = dbService;
     }
     
+    public long? AuthenticatedUser { get; set; }
+
     /// <inheritdoc />
     public string? Login(string username, string password)
     {
-        User? user;
-        using (var unitOfWork = _dbService.UnitOfWork)
-        {
-            user = unitOfWork.Users.GetByName(username);
-        }
-
+        using var unitOfWork = _dbService.UnitOfWork;
+        var user = unitOfWork.Users.GetByName(username);
+            
         if (user == null) return null;
-
-        return GetHashForComparison(password, user.PasswordSalt) == user.PasswordHash ? GenerateJWT(user.Id.ToString()) : null;
+        if (GetHashForComparison(password, user.PasswordSalt) != user.PasswordHash) return null;
+        
+        AuthenticatedUser = user.Id;
+        return GenerateJWT(user.Id.ToString());
     }
     
     /// <inheritdoc />

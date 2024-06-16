@@ -6,6 +6,12 @@ namespace AskAHuman.Services.Interfaces;
 public interface IAuthenticationService
 {
     /// <summary>
+    /// If the user is authenticated this property holds the id of the user.
+    /// If the user is not authenticated it is null.
+    /// </summary>
+    public long? AuthenticatedUser { get; set; }
+    
+    /// <summary>
     /// Used to Login a user.
     /// </summary>
     /// <param name="username">The username of the user to login.</param>
