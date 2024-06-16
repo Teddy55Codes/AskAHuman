@@ -11,6 +11,8 @@ public partial class Chat
 
     public long UsersQuestioningId { get; set; }
 
+    public DateTime CreatedAt { get; set; }
+    
     public sbyte Completed { get; set; }
     
     public string Title { get; set; }
