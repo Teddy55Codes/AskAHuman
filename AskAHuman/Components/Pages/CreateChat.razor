@@ -1,4 +1,4 @@
-﻿@page "/Chats/Create"
+﻿@page "/Questions/Create"
 @using System.ComponentModel.DataAnnotations
 @using AskAHuman.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
@@ -8,9 +8,9 @@
 @inject NavigationManager NavigationManager
 @inject ProtectedLocalStorage ProtectedLocalStorage
 
-<h1 Class="my-2">Create A New Chat</h1>
+<h1 Class="my-2">Create A New Question</h1>
 
-<MudText Class="my-2">To create a new chat enter your question below.</MudText>
+<MudText Class="my-2">To create a new question fill out the form below.</MudText>
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <MudCard>
@@ -62,8 +62,8 @@
             var chat = ChatService.CreateNewChat((long)AuthenticationService.AuthenticatedUser, model.Title, model.Question);
             if (chat.IsSuccess)
             {
-                NavigationManager.NavigateTo($"/Chats/{chat.Value.Id}");
-                Snackbar.Add("Created New Chat", Severity.Success);
+                NavigationManager.NavigateTo($"/Questions/{chat.Value.Id}");
+                Snackbar.Add("Created New Question", Severity.Success);
             }
             else
             {

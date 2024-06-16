@@ -10,9 +10,9 @@
 @inject ISnackbar Snackbar
 @implements IDisposable
 
-@page "/Chats/{chatId:long}"
+@page "/Questions/{chatId:long}"
 
-<MudText Class="ml-2" Color="@Color.Error" hidden="@(!isNotFound)" >Chat does not exist.</MudText>
+<MudText Class="ml-2" Color="@Color.Error" hidden="@(!isNotFound)" >Question does not exist.</MudText>
 
 <MudGrid Class="mt-1" hidden="@isNotFound">
     <MudCard Class="ml-3" hidden="@(chat.UsersAnswererId is not null ||
@@ -23,7 +23,7 @@
     <MudCard Class="ml-3" hidden="@(chat.UsersAnswererId is null ||
                                     AuthenticationService.AuthenticatedUser is null ||
                                     AuthenticationService.AuthenticatedUser != chat.UsersAnswererId)">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LeaveChat">Leave</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LeaveChat">Leave question</MudButton>
     </MudCard>
     <MudItem xs="12">
         <MudCard Elevation="2" Class="pa-2">

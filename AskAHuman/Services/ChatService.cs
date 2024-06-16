@@ -64,8 +64,8 @@ public class ChatService : IChatService
         }
         
         var chat = unitOfWork.Chats.GetByPrimaryKey(chatId);
-        if (chat is null) return Result.Fail("Chat does not exist.");
-        if (chat.UsersAnswererId is not null) return Result.Fail("Chat already has an answerer.");
+        if (chat is null) return Result.Fail("Question does not exist.");
+        if (chat.UsersAnswererId is not null) return Result.Fail("Question already has an answerer.");
         
         chat.UsersAnswererId = userId;
         chat.AnswererJoinedAt = DateTime.Now.ToUniversalTime();
@@ -79,7 +79,7 @@ public class ChatService : IChatService
     {
         using var unitOfWork = _dbService.UnitOfWork;
         var chat = unitOfWork.Chats.GetByPrimaryKey(chatId);
-        if (chat is null) return Result.Fail("Chat does not exist.");
+        if (chat is null) return Result.Fail("Question does not exist.");
         if (double.TryParse(_configuration["Administration:QuestionLeavableTimeInHours"], out var leaveableTimer) &&
             DateTime.Now.ToUniversalTime() - chat.AnswererJoinedAt <= TimeSpan.FromHours(leaveableTimer))
         {
