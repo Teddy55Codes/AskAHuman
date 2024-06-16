@@ -1,3 +1,26 @@
-﻿.mud-card-header {
+﻿@mixin wrapped-header {
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.mud-card-header {
     display: block;
+    
+    h2 {
+        @include wrapped-header;
+    }
+}
+
+.mud-card-content p {
+    overflow-wrap: break-word;
+}
+
+.mud-paper {
+    h1 {
+        @include wrapped-header;
+    }
+
+    p {
+        overflow-wrap: break-word;
+    }
 }
