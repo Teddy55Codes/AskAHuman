@@ -14,7 +14,7 @@ public interface IUserService
     public List<UserDTO> GetAll();
     
     /// <summary>
-    /// Gets a user be there id.
+    /// Gets a user be their id.
     /// </summary>
     /// <param name="id">The id of the user.</param>
     /// <returns>A result containing the user for the id.</returns>
@@ -32,5 +32,17 @@ public interface IUserService
     /// </summary>
     /// <param name="id">The id of the user to remove.</param>
     /// <returns>Whether the operation was succesful or not.</returns>
-    public bool RemoveUser(int id);
+    public bool RemoveUser(long id);
+    
+    /// <summary>
+    /// User disconnects
+    /// </summary>
+    /// <param name="id">The id of the user to remove.</param>
+    public void UserDisconnect(long id);
+    
+    /// <summary>
+    /// User comes online.
+    /// </summary>
+    /// <param name="id">The id of the user to remove.</param>
+    public void UserConnect(long id);
 }

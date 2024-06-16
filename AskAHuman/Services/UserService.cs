@@ -19,12 +19,14 @@ public class UserService : IUserService
         _dbService = dbService;
     }
 
+    /// <inheritdoc />
     public List<UserDTO> GetAll()
     {
         using var unitOfWork = _dbService.UnitOfWork;
         return unitOfWork.Users.GetAll().Select(u => new UserDTO(u)).ToList();
     }
 
+    /// <inheritdoc />
     public Result<User> GetById(long id)
     {
         using var unitOfWork = _dbService.UnitOfWork;
@@ -33,10 +35,7 @@ public class UserService : IUserService
         return Result.Ok(user);
     }
 
-    public string? Login(string username, string password) => _authenticationService.Login(username, password);
-
-    public bool Register(string username, string password) => !UserExists(username) && _authenticationService.Register(username, password);
-
+    /// <inheritdoc />
     public bool UserExists(string username)
     {
         if (username == string.Empty) return true;
@@ -44,7 +43,8 @@ public class UserService : IUserService
         return unitOfWork.Users.GetByName(username.ToLower()) != null;
     }
 
-    public bool RemoveUser(int id)
+    /// <inheritdoc />
+    public bool RemoveUser(long id)
     {
         using var unitOfWork = _dbService.UnitOfWork;
         var user = unitOfWork.Users.GetByPrimaryKey(id);
@@ -52,5 +52,23 @@ public class UserService : IUserService
         unitOfWork.Users.Remove(user);
         unitOfWork.Commit();
         return true;
+    }
+
+    /// <inheritdoc />
+    public void UserDisconnect(long id)
+    {
+        using var unitOfWork = _dbService.UnitOfWork;
+        var user = unitOfWork.Users.GetByPrimaryKey(id);
+        if (user == null) return;
+        unitOfWork.Commit();
+    }
+
+    /// <inheritdoc />
+    public void UserConnect(long id)
+    {
+        using var unitOfWork = _dbService.UnitOfWork;
+        var user = unitOfWork.Users.GetByPrimaryKey(id);
+        if (user == null) return;
+        unitOfWork.Commit();
     }
 }

@@ -167,9 +167,6 @@ public partial class AskAHumanDbContext(IConfiguration configuration) : DbContex
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("datetime");
-            entity.Property(e => e.LastOnlineAt)
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("datetime");
             entity.Property(e => e.PasswordHash).HasColumnType("text");
             entity.Property(e => e.PasswordSalt).HasColumnType("text");
             entity.Property(e => e.Reputation)

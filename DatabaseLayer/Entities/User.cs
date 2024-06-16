@@ -14,12 +14,8 @@ public partial class User
     public string PasswordSalt { get; set; } = null!;
 
     public long Reputation { get; set; }
-
-    public bool IsOnline { get; set; }
-
+    
     public DateTime CreatedAt { get; set; }
-
-    public DateTime LastOnlineAt { get; set; }
     
     public virtual ICollection<Message> Messagess { get; set; } = new List<Message>();
     

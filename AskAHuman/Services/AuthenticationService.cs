@@ -13,8 +13,8 @@ namespace AskAHuman.Services;
 
 public class AuthenticationService : IAuthenticationService
 {
-    private IConfiguration _configuration;
-    private IDbService _dbService;
+    private readonly IConfiguration _configuration;
+    private readonly IDbService _dbService;
     
     public AuthenticationService(IConfiguration configuration, IDbService dbService)
     {
@@ -32,7 +32,6 @@ public class AuthenticationService : IAuthenticationService
             
         if (user == null) return null;
         if (GetHashForComparison(password, user.PasswordSalt) != user.PasswordHash) return null;
-        
         AuthenticatedUser = user.Id;
         return GenerateJWT(user.Id.ToString());
     }
