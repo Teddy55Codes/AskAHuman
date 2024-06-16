@@ -3,7 +3,7 @@
 @using System.ComponentModel.DataAnnotations
 @using AskAHuman.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
-@inject ProtectedSessionStorage ProtectedSessionStore
+@inject ProtectedLocalStorage ProtectedLocalStorage
 @inject IUserService UserService
 @inject IAuthenticationService AuthenticationService
 @inject NavigationManager NavigationManager
@@ -60,7 +60,7 @@
         if (model.Password.Length is < 8 or > 30) return;
 
         AuthenticationService.Register(model.Username, model.Password);
-        await ProtectedSessionStore.SetAsync("Jwt", AuthenticationService.Login(model.Username, model.Password)!);
+        await ProtectedLocalStorage.SetAsync("Jwt", AuthenticationService.Login(model.Username, model.Password)!);
         NavigationManager.NavigateTo("/");
     }
 

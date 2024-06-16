@@ -22,9 +22,7 @@ public class LiveMessageService : ILiveMessageService, IDisposable
         _messageCoordinatorService = messageCoordinatorService;
     }
     
-    /// <summary>
-    /// Needs to be set before messages can be sent.
-    /// </summary>
+    /// <inheritdoc />
     public void SetInformation(long chatId, long userId)
     {
         AssociatedChat = chatId;
@@ -32,16 +30,19 @@ public class LiveMessageService : ILiveMessageService, IDisposable
         _messageCoordinatorService.AddInstance(this);
     }
 
+    /// <inheritdoc />
     public void SendMessageToChat(string message, long authorId)
     {
         OnMessageSent?.Invoke(message, AssociatedChat, authorId);
     }
 
+    /// <inheritdoc />
     public void ReceiveMessage(MessageDTO message)
     {
         OnMessageReceived?.Invoke(message);
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         if (AssociatedChat != 0) _messageCoordinatorService.RemoveInstance(this);

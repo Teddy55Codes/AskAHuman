@@ -21,6 +21,7 @@ public class AuthenticationService : IAuthenticationService
         _dbService = dbService;
     }
     
+    /// <inheritdoc />
     public string? Login(string username, string password)
     {
         User? user;
@@ -34,6 +35,7 @@ public class AuthenticationService : IAuthenticationService
         return GetHashForComparison(password, user.PasswordSalt) == user.PasswordHash ? GenerateJWT(user.Id.ToString()) : null;
     }
     
+    /// <inheritdoc />
     public bool Register(string username, string password)
     {
         using var unitOfWork = _dbService.UnitOfWork;
@@ -48,25 +50,7 @@ public class AuthenticationService : IAuthenticationService
         return true;
     }
     
-    private string GenerateJWT(string id)
-    {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-        var claims = new[] {
-            new Claim("userId", id)
-        };
-
-        var token = new JwtSecurityToken(
-            _configuration["Jwt:Issuer"],
-            _configuration["Jwt:Audience"],
-            claims,
-            expires: DateTime.Now.AddHours(3),
-            signingCredentials: credentials);
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-    
+    /// <inheritdoc />
     public Result<ClaimsPrincipal> ValidateJWT(string token)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -91,6 +75,25 @@ public class AuthenticationService : IAuthenticationService
         {
             return Result.Fail("Jwt token is invalid.");
         }
+    }
+    
+    private string GenerateJWT(string id)
+    {
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var claims = new[] {
+            new Claim("userId", id)
+        };
+
+        var token = new JwtSecurityToken(
+            _configuration["Jwt:Issuer"],
+            _configuration["Jwt:Audience"],
+            claims,
+            expires: DateTime.Now.AddHours(3),
+            signingCredentials: credentials);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     #region Hashing

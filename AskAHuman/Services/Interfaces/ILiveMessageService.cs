@@ -12,6 +12,7 @@ public interface ILiveMessageService
 
     /// <summary>
     /// Set the <see cref="AssociatedChat"/> and <see cref="AssociatedUser"/> for the service.
+    /// Needs to be set before messages can be sent.
     /// </summary>
     /// <param name="chatId">The id of the chat.</param>
     /// <param name="userId">The id of the user.</param>

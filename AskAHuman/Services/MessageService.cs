@@ -13,12 +13,14 @@ public class MessageService : IMessageService
         _dbService = dbService;
     }
     
+    /// <inheritdoc />
     public List<MessageDTO> GetMessagesForChatById(long chatId)
     {
         using var uow = _dbService.UnitOfWork;
         return uow.Messages.GetMessagesByChatId(chatId).Select(m => new MessageDTO(m.Content, uow.Users.GetByPrimaryKey(m.AuthorId)!.Username)).ToList();
     }
 
+    /// <inheritdoc />
     public MessageDTO CreateNiceMessage(string message, long userId)
     {
         using var uow = _dbService.UnitOfWork;

@@ -17,6 +17,7 @@ public class LiveMessageCoordinatorService : ILiveMessageCoordinatorService
         _messageService = messageService;
     }
     
+    /// <inheritdoc />
     public void AddInstance(ILiveMessageService liveMessageService)
     {
         _messageServicesInstances.AddOrUpdate(
@@ -28,9 +29,10 @@ public class LiveMessageCoordinatorService : ILiveMessageCoordinatorService
                 return list;
             });
         
-        liveMessageService.OnMessageSent += PrccessMessage;
+        liveMessageService.OnMessageSent += ProcessMessage;
     }
 
+    /// <inheritdoc />
     public void RemoveInstance(ILiveMessageService liveMessageService)
     {
         _messageServicesInstances.AddOrUpdate(
@@ -42,10 +44,10 @@ public class LiveMessageCoordinatorService : ILiveMessageCoordinatorService
                 return list;
             });
 
-        liveMessageService.OnMessageSent -= PrccessMessage;
+        liveMessageService.OnMessageSent -= ProcessMessage;
     }
 
-    private void PrccessMessage(string message, long chatId, long authorId)
+    private void ProcessMessage(string message, long chatId, long authorId)
     {
         var msg = _messageService.CreateNiceMessage(message, authorId);
         foreach (var instance in _messageServicesInstances[chatId])
