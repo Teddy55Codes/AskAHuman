@@ -28,6 +28,13 @@ public interface IChatService
     /// <param name="chatId">The chat to set the <see cref="Chat.UsersAnswerer"/> on.</param>
     /// <returns>The result for the claimed chat.</returns>
     public Result<Chat> ClaimChat(long userId, long chatId);
+    
+    /// <summary>
+    /// User removes themselves as the answerer of a chat. 
+    /// </summary>
+    /// <param name="chatId">The chat to remove the <see cref="Chat.UsersAnswerer"/> from.</param>
+    /// <returns>The result for the claimed chat.</returns>
+    public Result<Chat> RemoveAnswererFromChat(long chatId);
 
     /// <summary>
     /// Gets a chat by id.

@@ -68,8 +68,28 @@ public class ChatService : IChatService
         if (chat.UsersAnswererId is not null) return Result.Fail("Chat already has an answerer.");
         
         chat.UsersAnswererId = userId;
+        chat.AnswererJoinedAt = DateTime.Now.ToUniversalTime();
         unitOfWork.Commit();
-        return Result.Ok(chat);
+        return chat;
+
+    }
+
+    /// <inheritdoc />
+    public Result<Chat> RemoveAnswererFromChat(long chatId)
+    {
+        using var unitOfWork = _dbService.UnitOfWork;
+        var chat = unitOfWork.Chats.GetByPrimaryKey(chatId);
+        if (chat is null) return Result.Fail("Chat does not exist.");
+        if (double.TryParse(_configuration["Administration:QuestionLeavableTimeInHours"], out var leaveableTimer) &&
+            DateTime.Now.ToUniversalTime() - chat.AnswererJoinedAt <= TimeSpan.FromHours(leaveableTimer))
+        {
+            return Result.Fail($"You can only leave a question after {leaveableTimer} hours.");
+        }
+
+        chat.UsersAnswerer = null;
+        chat.UsersAnswererId = null;
+        unitOfWork.Commit();
+        return chat;
 
     }
 
