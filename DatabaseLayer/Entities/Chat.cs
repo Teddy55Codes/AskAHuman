@@ -13,6 +13,8 @@ public partial class Chat
 
     public DateTime CreatedAt { get; set; }
     
+    public DateTime? AnswererJoinedAt { get; set; }
+    
     public sbyte Completed { get; set; }
     
     public string Title { get; set; }

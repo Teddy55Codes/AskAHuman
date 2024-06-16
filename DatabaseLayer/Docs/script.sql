@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `askahuman`.`chats` (
     `UsersAnswererId` BIGINT(20) NULL,
     `UsersQuestioningId` BIGINT(20) NOT NULL,
     `CreatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    `AnswererJoinedAt` DATETIME NULL,
     `Completed` TINYINT(4) NOT NULL DEFAULT 0,
     `Title` TEXT NOT NULL,
     `Question` TEXT NOT NULL,
