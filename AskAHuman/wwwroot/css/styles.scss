@@ -23,11 +23,10 @@ html, .mud-layout, .mud-main-content {
     }
 }
 
-.mud-card-content {
-    p {
-        overflow-wrap: break-word;
-    }
+p {
+    overflow-wrap: break-word;
 }
+
 
 .mud-paper {
     h1 {
@@ -43,10 +42,23 @@ html, .mud-layout, .mud-main-content {
     white-space: pre-wrap
 }
 
+.max-width {
+    max-width: 70%;
+}
+
 .author {
     font-weight: bold;
 }
 
 .chat-box {
     display: flex;
+}
+
+#you-message {
+    text-align: right;
+}
+
+#chat-messages {
+    max-height: 50vh;
+    overflow-y: auto;
 }

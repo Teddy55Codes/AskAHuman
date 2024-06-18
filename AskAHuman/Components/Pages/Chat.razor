@@ -15,11 +15,13 @@
 <MudText Class="ml-2" Color="@Color.Error" hidden="@(!isNotFound)">Question does not exist.</MudText>
 
 <MudGrid Class="d-flex flex-column flex-nowrap flex-grow-1 gap-4 mt-1" hidden="@isNotFound">
-    <div Class="ml-3" hidden="@(chat?.UsersAnswererId is not null || AuthenticationService.AuthenticatedUser is null || AuthenticationService.AuthenticatedUser == chat?.UsersQuestioningId)">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="JoinChat">Join as Answerer</MudButton>
-    </div>
-    <div Class="ml-3" hidden="@(chat?.UsersAnswererId is null || AuthenticationService.AuthenticatedUser is null || AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId)">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LeaveChat">Leave question</MudButton>
+    <div class="d-flex">
+        <div Class="ml-3" hidden="@(chat?.UsersAnswererId is not null || AuthenticationService.AuthenticatedUser is null || AuthenticationService.AuthenticatedUser == chat?.UsersQuestioningId)">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="JoinChat">Join as Answerer</MudButton>
+        </div>
+        <div Class="ml-3" hidden="@(chat?.UsersAnswererId is null || AuthenticationService.AuthenticatedUser is null || AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId)">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LeaveChat">Leave question</MudButton>
+        </div>
     </div>
     <div>
         <MudCard Elevation="2" Class="pa-2">
@@ -27,38 +29,40 @@
             <p Class="ma-6 flex-wrap preserve-white-space">@chat?.Question</p>
         </MudCard>
     </div>
-    <MudItem Class="flex-1" xs="12">
-        <div class="d-flex">
+    <MudItem id="chat-messages" Class="flex-1" xs="12">
+        <div class="d-flex flex-column flex-nowrap">
             @foreach (var message in messages)
             {
                 @if (message.AuthorId == AuthenticationService.AuthenticatedUser)
                 {
-                    <MudCard Class="align-self-end pa-1 my-2" Elevation="2">
-                        <h3 Class="mx-3 mb-6 mt-3">@message.AuthorName</h3>
-                        <MudText Class="mx-3 my-3">@message.Message</MudText>
+                    <MudCard Class="max-width align-self-end pa-1 my-2" Elevation="2">
+                        <MudItem Class="mx-3 my-3">
+                            <p id="you-message" class="author">You</p>
+                            <p class="preserve-white-space">@message.Message</p>
+                        </MudItem>
                     </MudCard>
                 }
                 else
                 {
-                    <MudCard Class="align-self-start pa-1 my-2" Elevation="2">
-                        <h3 Class="mx-3 mb-6 mt-3">@message.AuthorName</h3>
-                        <MudText Class="mx-3 my-3">@message.Message</MudText>
+                    <MudCard Class="max-width align-self-start pa-1 my-2" Elevation="2">
+                        <MudItem Class="mx-3 my-3">
+                            <p class="author">@message.AuthorName</p>
+                            <p class="preserve-white-space">@message.Message</p>
+                        </MudItem>
                     </MudCard>
                 }
             }
         </div>
     </MudItem>
-    <div hidden="@(AuthenticationService.AuthenticatedUser is null ||
-                       (AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId &&
-                        AuthenticationService.AuthenticatedUser != chat?.UsersQuestioningId))">
+    <div hidden="@(AuthenticationService.AuthenticatedUser is null || (AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId && AuthenticationService.AuthenticatedUser != chat?.UsersQuestioningId))">
         <MudCard Class="px-4">
             <EditForm Model="@model" OnValidSubmit="SendChatMessage">
                 <DataAnnotationsValidator/>
                 <MudGrid Class="d-flex flex-nowrap">
                     <MudItem Class="flex-grow-1">
-                        <MudTextField Label="Message" Variant="Variant.Outlined" @bind-Value="model.message" For="@(() => model.message)"/>
+                        <MudTextField Label="Message" Lines="3" Variant="Variant.Outlined" @bind-Value="model.message" For="@(() => model.message)"/>
                     </MudItem>
-                    <MudItem Class="px-0 py-5">
+                    <MudItem Class="px-0 py-5 align-self-center ">
                         <MudIconButton Icon="@Icons.Material.Filled.Send" Color="Color.Primary" ButtonType="ButtonType.Submit"/>
                     </MudItem>
                 </MudGrid>
