@@ -61,7 +61,7 @@
 
         AuthenticationService.Register(model.Username, model.Password);
         await ProtectedLocalStorage.SetAsync("Jwt", AuthenticationService.Login(model.Username, model.Password)!);
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/", true);
     }
 
 }

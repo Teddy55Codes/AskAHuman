@@ -54,7 +54,7 @@
         }
         
         await ProtectedLocalStorage.SetAsync("Jwt", jwt);
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/", true);
     }
 
 }
