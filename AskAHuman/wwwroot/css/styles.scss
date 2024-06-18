@@ -3,6 +3,18 @@
     white-space: normal;
 }
 
+html, .mud-layout, .mud-main-content {
+    height: 100vh;
+
+    & > .mud-container {
+        height: 100vh;
+
+        & > .mud-grid {
+            height: 87vh;
+        }
+    }
+}
+
 .mud-card-header {
     display: block;
     
@@ -33,4 +45,8 @@
 
 .author {
     font-weight: bold;
+}
+
+.chat-box {
+    display: flex;
 }

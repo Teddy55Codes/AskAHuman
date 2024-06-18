@@ -12,73 +12,65 @@
 
 @page "/Questions/{chatId:long}"
 
-<MudText Class="ml-2" Color="@Color.Error" hidden="@(!isNotFound)" >Question does not exist.</MudText>
+<MudText Class="ml-2" Color="@Color.Error" hidden="@(!isNotFound)">Question does not exist.</MudText>
 
-<MudGrid Class="mt-1" hidden="@isNotFound">
-    <MudCard Class="ml-3" hidden="@(chat?.UsersAnswererId is not null ||
-                                    AuthenticationService.AuthenticatedUser is null ||
-                                    AuthenticationService.AuthenticatedUser == chat?.UsersQuestioningId)">
+<MudGrid Class="d-flex flex-column flex-nowrap flex-grow-1 gap-4 mt-1" hidden="@isNotFound">
+    <div Class="ml-3" hidden="@(chat?.UsersAnswererId is not null || AuthenticationService.AuthenticatedUser is null || AuthenticationService.AuthenticatedUser == chat?.UsersQuestioningId)">
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="JoinChat">Join as Answerer</MudButton>
-    </MudCard>
-    <MudCard Class="ml-3" hidden="@(chat?.UsersAnswererId is null ||
-                                    AuthenticationService.AuthenticatedUser is null ||
-                                    AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId)">
+    </div>
+    <div Class="ml-3" hidden="@(chat?.UsersAnswererId is null || AuthenticationService.AuthenticatedUser is null || AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId)">
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LeaveChat">Leave question</MudButton>
-    </MudCard>
-    <MudItem xs="12">
+    </div>
+    <div>
         <MudCard Elevation="2" Class="pa-2">
             <h1 Class="mx-3 my-6">@chat?.Title</h1>
             <p Class="ma-6 flex-wrap preserve-white-space">@chat?.Question</p>
         </MudCard>
-    </MudItem>
-    <MudItem Class="d-flex" xs="12">
-        @foreach (var message in messages)
-        {
-            @if (message.AuthorId == AuthenticationService.AuthenticatedUser)
+    </div>
+    <MudItem Class="flex-1" xs="12">
+        <div class="d-flex">
+            @foreach (var message in messages)
             {
-                <MudCard Class="align-self-end pa-1 my-2" Elevation="2">
-                    <h3 Class="mx-3 mb-6 mt-3">@message.AuthorName</h3>
-                    <MudText Class="mx-3 my-3">@message.Message</MudText>
-                </MudCard>
+                @if (message.AuthorId == AuthenticationService.AuthenticatedUser)
+                {
+                    <MudCard Class="align-self-end pa-1 my-2" Elevation="2">
+                        <h3 Class="mx-3 mb-6 mt-3">@message.AuthorName</h3>
+                        <MudText Class="mx-3 my-3">@message.Message</MudText>
+                    </MudCard>
+                }
+                else
+                {
+                    <MudCard Class="align-self-start pa-1 my-2" Elevation="2">
+                        <h3 Class="mx-3 mb-6 mt-3">@message.AuthorName</h3>
+                        <MudText Class="mx-3 my-3">@message.Message</MudText>
+                    </MudCard>
+                }
             }
-            else
-            {
-                <MudCard Class="align-self-start pa-1 my-2" Elevation="2">
-                    <h3 Class="mx-3 mb-6 mt-3">@message.AuthorName</h3>
-                    <MudText Class="mx-3 my-3">@message.Message</MudText>
-                </MudCard>
-            }
-        }
+        </div>
     </MudItem>
-    <MudItem xs="12" Elevation="2">
-        <MudCard hidden="@(AuthenticationService.AuthenticatedUser is null || 
-                           (AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId && 
-                            AuthenticationService.AuthenticatedUser != chat?.UsersQuestioningId))">
+    <div hidden="@(AuthenticationService.AuthenticatedUser is null ||
+                       (AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId &&
+                        AuthenticationService.AuthenticatedUser != chat?.UsersQuestioningId))">
+        <MudCard Class="px-4">
             <EditForm Model="@model" OnValidSubmit="SendChatMessage">
                 <DataAnnotationsValidator/>
-                <MudGrid Class="align-center">
-                    <MudItem xs="11">
-                        <MudCardContent>
-                            <MudTextField Label="Message" Variant="Variant.Outlined" @bind-Value="model.message" For="@(() => model.message)"/>
-                        </MudCardContent>
+                <MudGrid Class="d-flex flex-nowrap">
+                    <MudItem Class="flex-grow-1">
+                        <MudTextField Label="Message" Variant="Variant.Outlined" @bind-Value="model.message" For="@(() => model.message)"/>
                     </MudItem>
-                    <MudItem xs="1">
-                        <MudCardActions>
-                            <MudIconButton Icon="@Icons.Material.Filled.Send" Color="Color.Primary" ButtonType="ButtonType.Submit"/>
-                        </MudCardActions>
+                    <MudItem Class="px-0 py-5">
+                        <MudIconButton Icon="@Icons.Material.Filled.Send" Color="Color.Primary" ButtonType="ButtonType.Submit"/>
                     </MudItem>
                 </MudGrid>
             </EditForm>
         </MudCard>
-    </MudItem>
+    </div>
 </MudGrid>
 
 
-
 @code {
-    [Parameter]
-    public long ChatId { get; set; }
-    
+    [Parameter] public long ChatId { get; set; }
+
     public TextMessage model = new();
 
     private bool isNotFound;
@@ -91,10 +83,11 @@
     {
         public string message { get; set; }
     }
-    
+
     private void SendChatMessage()
     {
-        if (string.IsNullOrEmpty(model.message) || AuthenticationService.AuthenticatedUser is null) return;
+        if (string.IsNullOrEmpty(model.message) || AuthenticationService.AuthenticatedUser is null ||
+            (AuthenticationService.AuthenticatedUser != chat?.UsersQuestioningId && AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId)) return;
         LiveMessageService.SendMessageToChat(model.message, (long)AuthenticationService.AuthenticatedUser);
         model = new();
     }
@@ -103,7 +96,7 @@
     {
         if (AuthenticationService.AuthenticatedUser is null) return;
         var result = ChatService.ClaimChat((long)AuthenticationService.AuthenticatedUser, ChatId);
-        
+
         if (result.IsSuccess)
         {
             NavigationManager.Refresh(true);
@@ -120,7 +113,7 @@
     private void LeaveChat()
     {
         var result = ChatService.RemoveAnswererFromChat(ChatId);
-        
+
         if (result.IsSuccess)
         {
             NavigationManager.Refresh(true);
@@ -142,12 +135,13 @@
             isNotFound = true;
             return;
         }
-        messages = MessageService.GetMessagesForChatById(ChatId);   
-        
+
+        messages = MessageService.GetMessagesForChatById(ChatId);
+
         if (AuthenticationService.AuthenticatedUser is not null || await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage))
         {
             StateHasChanged();
-            
+
             LiveMessageService.SetInformation(ChatId, (long)AuthenticationService.AuthenticatedUser!);
             LiveMessageService.OnMessageReceived += MessageReceived;
         }
@@ -163,4 +157,5 @@
     {
         if (LiveMessageService is IDisposable disposable) disposable.Dispose();
     }
+
 }
