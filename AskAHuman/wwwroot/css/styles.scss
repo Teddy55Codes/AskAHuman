@@ -11,8 +11,10 @@
     }
 }
 
-.mud-card-content p {
-    overflow-wrap: break-word;
+.mud-card-content {
+    p {
+        overflow-wrap: break-word;
+    }
 }
 
 .mud-paper {
@@ -27,4 +29,8 @@
 
 .preserve-white-space {
     white-space: pre-wrap
+}
+
+.author {
+    font-weight: bold;
 }
