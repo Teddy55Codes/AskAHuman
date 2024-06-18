@@ -2,6 +2,7 @@
 using DatabaseLayer;
 using DataBaseLayer.DTOs;
 using DatabaseLayer.Entities;
+using DatabaseLayer.Entities.Enums;
 using FluentResults;
 
 namespace AskAHuman.Services;
@@ -35,14 +36,14 @@ public class ChatService : IChatService
     public List<ChatCardDTO> GetUsersActiveChatsAsCards(long userId)
     {
         using var uow = _dbService.UnitOfWork;
-        return uow.Chats.GetChatsRelatedToUser(userId).Where(c => c.Completed == 0).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question)).ToList();
+        return uow.Chats.GetChatsRelatedToUser(userId).Where(c => c.State == ChatState.Open).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question)).ToList();
     }
 
     /// <inheritdoc />
     public List<ChatCardDTO> GetUsersCompletedChatsAsCards(long userId)
     {
         using var uow = _dbService.UnitOfWork;
-        return uow.Chats.GetChatsRelatedToUser(userId).Where(c => c.Completed == 1).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question)).ToList();
+        return uow.Chats.GetChatsRelatedToUser(userId).Where(c => c.State != ChatState.Open).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question)).ToList();
     }
 
     /// <inheritdoc />

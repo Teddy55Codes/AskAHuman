@@ -53,7 +53,7 @@ public partial class AskAHumanDbContext(IConfiguration configuration) : DbContex
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("datetime");
             entity.Property(e => e.AnswererJoinedAt).HasColumnType("datetime");
-            entity.Property(e => e.Completed).HasColumnType("tinyint(4)");
+            entity.Property(e => e.State).HasColumnType("int(11)");
             entity.Property(e => e.Title).HasColumnType("text");
             entity.Property(e => e.Question).HasColumnType("text");
 
