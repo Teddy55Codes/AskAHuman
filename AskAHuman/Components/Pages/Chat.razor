@@ -15,20 +15,20 @@
 <MudText Class="ml-2" Color="@Color.Error" hidden="@(!isNotFound)" >Question does not exist.</MudText>
 
 <MudGrid Class="mt-1" hidden="@isNotFound">
-    <MudCard Class="ml-3" hidden="@(chat.UsersAnswererId is not null ||
+    <MudCard Class="ml-3" hidden="@(chat?.UsersAnswererId is not null ||
                                     AuthenticationService.AuthenticatedUser is null ||
-                                    AuthenticationService.AuthenticatedUser == chat.UsersQuestioningId)">
+                                    AuthenticationService.AuthenticatedUser == chat?.UsersQuestioningId)">
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="JoinChat">Join as Answerer</MudButton>
     </MudCard>
-    <MudCard Class="ml-3" hidden="@(chat.UsersAnswererId is null ||
+    <MudCard Class="ml-3" hidden="@(chat?.UsersAnswererId is null ||
                                     AuthenticationService.AuthenticatedUser is null ||
-                                    AuthenticationService.AuthenticatedUser != chat.UsersAnswererId)">
+                                    AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId)">
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LeaveChat">Leave question</MudButton>
     </MudCard>
     <MudItem xs="12">
         <MudCard Elevation="2" Class="pa-2">
-            <h1 Class="mx-3 my-6">@chat.Title</h1>
-            <MudText Class="ma-6 flex-wrap">@chat.Question</MudText>
+            <h1 Class="mx-3 my-6">@chat?.Title</h1>
+            <p Class="ma-6 flex-wrap preserve-white-space">@chat?.Question</p>
         </MudCard>
     </MudItem>
     <MudItem Class="d-flex" xs="12">
@@ -51,7 +51,9 @@
         }
     </MudItem>
     <MudItem xs="12" Elevation="2">
-        <MudCard hidden="@(AuthenticationService.AuthenticatedUser is null || (AuthenticationService.AuthenticatedUser != chat.UsersAnswererId && AuthenticationService.AuthenticatedUser != chat.UsersQuestioningId))">
+        <MudCard hidden="@(AuthenticationService.AuthenticatedUser is null || 
+                           (AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId && 
+                            AuthenticationService.AuthenticatedUser != chat?.UsersQuestioningId))">
             <EditForm Model="@model" OnValidSubmit="SendChatMessage">
                 <DataAnnotationsValidator/>
                 <MudGrid Class="align-center">
