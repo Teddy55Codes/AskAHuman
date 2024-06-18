@@ -146,7 +146,7 @@
         {
             StateHasChanged();
             
-            LiveMessageService.SetInformation(ChatId, (long)AuthenticationService.AuthenticatedUser);
+            LiveMessageService.SetInformation(ChatId, (long)AuthenticationService.AuthenticatedUser!);
             LiveMessageService.OnMessageReceived += MessageReceived;
         }
     }

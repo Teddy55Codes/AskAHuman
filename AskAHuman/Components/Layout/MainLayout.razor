@@ -45,7 +45,7 @@
         {
             _isAuthenticated = value;
             accountIcon = _isAuthenticated ? Icons.Material.Filled.Person : Icons.Material.Filled.PersonOff;
-            accountIconTarget = _isAuthenticated ? $"/account/{AuthenticationService.AuthenticatedUser}" : "/login";
+            accountIconTarget = _isAuthenticated ? $"/Accounts/{AuthenticationService.AuthenticatedUser}" : "/login";
         }
     }
     

@@ -21,6 +21,12 @@ public interface IAuthenticationService
     public string? Login(string username, string password);
     
     /// <summary>
+    /// Used to Log out the user.
+    /// </summary>
+    /// <param name="protectedLocalStorage">The <see cref="ProtectedLocalStorage"/> for removing the users jwt token.</param>
+    public Task Logout(ProtectedLocalStorage protectedLocalStorage);
+    
+    /// <summary>
     /// User to register a new user.
     /// </summary>
     /// <param name="username">The username of the new user.</param>
@@ -31,6 +37,7 @@ public interface IAuthenticationService
     /// <summary>
     /// Authenticates a user via the browsers local storage
     /// </summary>
+    /// <param name="protectedLocalStorage">The <see cref="ProtectedLocalStorage"/> To put the jwt token in.</param>
     /// <returns>Is the user authenticated.</returns>
     public Task<bool> AuthenticateViaLocalStorage(ProtectedLocalStorage protectedLocalStorage);
     

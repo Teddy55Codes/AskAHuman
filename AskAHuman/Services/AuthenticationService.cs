@@ -35,7 +35,14 @@ public class AuthenticationService : IAuthenticationService
         AuthenticatedUser = user.Id;
         return GenerateJWT(user.Id.ToString());
     }
-    
+
+    /// <inheritdoc />
+    public async Task Logout(ProtectedLocalStorage protectedLocalStorage)
+    {
+        await protectedLocalStorage.DeleteAsync("Jwt");
+        AuthenticatedUser = null;
+    }
+
     /// <inheritdoc />
     public bool Register(string username, string password)
     {

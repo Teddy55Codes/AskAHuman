@@ -1,9 +1,18 @@
-﻿@page "/Account/{userId:long}"
+﻿@page "/Accounts/{userId:long}"
 
 @using AskAHuman.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject IUserService UserService
+@inject ProtectedLocalStorage ProtectedLocalStorage
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
 
-<h1>@displayText</h1>
+
+<div Class="d-flex">
+    <h1 Class="flex-grow-1">@displayText</h1>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" hidden="@(AuthenticationService.AuthenticatedUser is null || AuthenticationService.AuthenticatedUser != UserId)" OnClick="@(Logout)">Logout</MudButton>
+</div>
+<hr/>
 
 @code {
     [Parameter]
@@ -12,9 +21,19 @@
     private bool success;
     private string displayText;
     
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         var userResult = UserService.GetById(UserId);
         displayText = userResult.IsSuccess ? userResult.Value.Username : userResult.Errors[0].Message;
+        if (AuthenticationService.AuthenticatedUser is not null || await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage))
+        {
+            StateHasChanged();
+        }
+    }
+
+    private async Task Logout()
+    {
+        await AuthenticationService.Logout(ProtectedLocalStorage);
+        await InvokeAsync(() => NavigationManager.NavigateTo("/", true));
     }
 }
