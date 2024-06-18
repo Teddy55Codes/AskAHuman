@@ -10,24 +10,7 @@
 <h1>Questions</h1>
 
 <MudButton Class="my-3" Variant="Variant.Filled" Color="Color.Primary" hidden="@(AuthenticationService.AuthenticatedUser is null)" OnClick="@(() => NavigationManager.NavigateTo("/Questions/Create"))">Create New Question</MudButton>
-<MudGrid Class="d-flex">
-    @foreach (var chat in currentChats)
-    {
-        <MudItem Class="my-3" xs="12" sm="6" md="3">
-            <MudCard Elevation="2">
-                <MudCardHeader>
-                    <h2>@(chat.Title.Length > 50 ? chat.Title[..50] + "..." : chat.Title)</h2>
-                </MudCardHeader>
-                <MudCardContent>
-                    <p>@(chat.Question.Length > 100 ? chat.Question[..100] + "..." : chat.Question)</p>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton Class="ma-2" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo("/Questions/" + chat.id))">Open Chat</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
-    }
-</MudGrid>
+<ChatCards Chats="@(currentChats)"/>
 
 @code {
     private List<ChatCardDTO> currentChats = new();

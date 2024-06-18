@@ -1,0 +1,26 @@
+﻿@using DataBaseLayer.DTOs
+@inject NavigationManager NavigationManager
+
+<MudGrid Class="d-flex">
+    @foreach (var chat in Chats)
+    {
+    <MudItem Class="my-3" xs="12" sm="6" md="3">
+        <MudCard Elevation="2">
+            <MudCardHeader>
+                <h2>@(chat.Title.Length > 50 ? chat.Title[..50] + "..." : chat.Title)</h2>
+            </MudCardHeader>
+            <MudCardContent>
+                <p>@(chat.Question.Length > 100 ? chat.Question[..100] + "..." : chat.Question)</p>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Class="ma-2" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo("/Questions/" + chat.id))">Open Question</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    }
+</MudGrid>
+
+@code {
+    [Parameter]
+    public List<ChatCardDTO> Chats { get; set; }
+}

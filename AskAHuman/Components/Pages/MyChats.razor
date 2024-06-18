@@ -10,46 +10,17 @@
 <h1>My Questions</h1>
 <MudButton Class="my-3" Variant="Variant.Filled" Color="Color.Primary" hidden="@(AuthenticationService.AuthenticatedUser is null)" OnClick="@(() => NavigationManager.NavigateTo("/Questions/Create"))">Create New Question</MudButton>
 
-<h2 hidden="@(AuthenticationService.AuthenticatedUser is null)">Active Questions</h2>
-<MudText hidden="@(AuthenticationService.AuthenticatedUser != null)">You need to be logged in to have/create questions.</MudText>
-<MudGrid Class="d-flex" hidden="@(AuthenticationService.AuthenticatedUser is null)">
-    @foreach (var chat in currentChats)
-    {
-        <MudItem Class="my-3" xs="12" sm="6" md="3">
-            <MudCard Elevation="2">
-                <MudCardHeader>
-                    <h2>@(chat.Title.Length > 50 ? chat.Title[..50] + "..." : chat.Title)</h2>
-                </MudCardHeader>
-                <MudCardContent>
-                    <p>@(chat.Question.Length > 100 ? chat.Question[..100] + "..." : chat.Question)</p>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton Class="ma-2" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo("/Questions/" + chat.id))">Open Chat</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
-    }
-</MudGrid>
-<h2 hidden="@(AuthenticationService.AuthenticatedUser is null)">Completed Questions</h2>
+<MudText hidden="@(AuthenticationService.AuthenticatedUser is not null)">You need to be logged in to have/create questions.</MudText>
+<div hidden="@(AuthenticationService.AuthenticatedUser is null)">
+    <h2>Active Questions</h2>
+    <ChatCards Chats="@(currentChats)"/>
 
-<MudGrid Class="d-flex" hidden="@(AuthenticationService.AuthenticatedUser is null)">
-    @foreach (var chat in completedChats)
-    {
-    <MudItem Class="my-3" xs="12" sm="6" md="3">
-        <MudCard Elevation="2">
-            <MudCardHeader>
-                <h2>@(chat.Title.Length > 50 ? chat.Title[..50] + "..." : chat.Title)</h2>
-            </MudCardHeader>
-            <MudCardContent>
-                <p>@(chat.Question.Length > 100 ? chat.Question[..100] + "..." : chat.Question)</p>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton Class="ma-2" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo("/Questions/" + chat.id))">Open Chat</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </MudItem>
-    }
-</MudGrid>
+    <h2>Completed Questions</h2>
+
+    <ChatCards Chats="@(completedChats)"/>
+</div>
+
+
 
 @code {
     private List<ChatCardDTO> currentChats = new();
@@ -57,14 +28,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (AuthenticationService.AuthenticatedUser is null)
+        if (AuthenticationService.AuthenticatedUser is not null || await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage))
         {
-            await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage);
-        }
-
-        if (AuthenticationService.AuthenticatedUser is not null)
-        {
-            currentChats = ChatService.GetUsersActiveChatsAsCards((long)AuthenticationService.AuthenticatedUser);
+            currentChats = ChatService.GetUsersActiveChatsAsCards((long)AuthenticationService.AuthenticatedUser!);
             completedChats = ChatService.GetUsersCompletedChatsAsCards((long)AuthenticationService.AuthenticatedUser);
         }
     }
