@@ -1,5 +1,6 @@
 ﻿@using AskAHuman.Services.Interfaces
 @using DataBaseLayer.DTOs
+@using DatabaseLayer.Entities.Enums
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject IChatService ChatService
 @inject IAuthenticationService AuthenticationService
@@ -15,12 +16,21 @@
 <MudText Class="ml-2" Color="@Color.Error" hidden="@(!isNotFound)">Question does not exist.</MudText>
 
 <MudGrid Class="d-flex flex-column flex-nowrap flex-grow-1 gap-4 mt-1" hidden="@isNotFound">
-    <div class="d-flex">
-        <div Class="ml-3" hidden="@(chat?.UsersAnswererId is not null || AuthenticationService.AuthenticatedUser is null || AuthenticationService.AuthenticatedUser == chat?.UsersQuestioningId)">
+    <div class="d-flex" hidden="@(AuthenticationService.AuthenticatedUser is null || chat is null || chat.State != ChatState.Open)">
+        <div Class="ml-3" hidden="@(chat.UsersAnswererId is not null || 
+                                    AuthenticationService.AuthenticatedUser == chat.UsersQuestioningId)">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="JoinChat">Join as Answerer</MudButton>
         </div>
-        <div Class="ml-3" hidden="@(chat?.UsersAnswererId is null || AuthenticationService.AuthenticatedUser is null || AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId)">
+        <div Class="ml-3" hidden="@(chat.UsersAnswererId is null || 
+                                    AuthenticationService.AuthenticatedUser != chat.UsersAnswererId)">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LeaveChat">Leave question</MudButton>
+        </div>
+        <div Class="ml-3" hidden="@(AuthenticationService.AuthenticatedUser != chat.UsersQuestioningId || 
+                                    chat.UsersAnswererId is null)">
+            <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(() => CloseQuestion(true))">Approve Answer</MudButton>
+        </div>
+        <div Class="ml-3" hidden="@(AuthenticationService.AuthenticatedUser != chat.UsersQuestioningId)">
+            <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => CloseQuestion(false))">Close Question</MudButton>
         </div>
     </div>
     <div>
@@ -54,7 +64,11 @@
             }
         </div>
     </MudItem>
-    <div hidden="@(AuthenticationService.AuthenticatedUser is null || (AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId && AuthenticationService.AuthenticatedUser != chat?.UsersQuestioningId))">
+    <div hidden="@(AuthenticationService.AuthenticatedUser is null || 
+                   chat is null || 
+                   chat.State != ChatState.Open ||
+                   (AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId && 
+                    AuthenticationService.AuthenticatedUser != chat?.UsersQuestioningId))">
         <MudCard Class="px-4">
             <EditForm Model="@model" OnValidSubmit="SendChatMessage">
                 <DataAnnotationsValidator/>
@@ -90,7 +104,12 @@
 
     private void SendChatMessage()
     {
-        if (string.IsNullOrEmpty(model.message) || AuthenticationService.AuthenticatedUser is null ||
+        if (chat is null || chat.State != ChatState.Open)
+        {
+            Snackbar.Add("Question is not available.", Severity.Error);
+            return;
+        }
+        if (string.IsNullOrEmpty(model.message) || AuthenticationService.AuthenticatedUser is null || 
             (AuthenticationService.AuthenticatedUser != chat?.UsersQuestioningId && AuthenticationService.AuthenticatedUser != chat?.UsersAnswererId)) return;
         LiveMessageService.SendMessageToChat(model.message, (long)AuthenticationService.AuthenticatedUser);
         model = new();
@@ -104,6 +123,23 @@
         if (result.IsSuccess)
         {
             NavigationManager.Refresh(true);
+        }
+        else
+        {
+            foreach (var error in result.Errors)
+            {
+                Snackbar.Add(error.Message, Severity.Error);
+            }
+        }
+    }
+
+    private void CloseQuestion(bool wasSolved)
+    {
+        if (AuthenticationService.AuthenticatedUser is null) return;
+        var result = ChatService.CompleteChat((long)AuthenticationService.AuthenticatedUser, ChatId, wasSolved);
+        if (result.IsSuccess)
+        {
+            NavigationManager.NavigateTo("/");
         }
         else
         {

@@ -73,6 +73,28 @@ public class ChatService : IChatService
     }
 
     /// <inheritdoc />
+    public Result CompleteChat(long userId, long chatId, bool wasQuestionSolved)
+    {
+        using var unitOfWork = _dbService.UnitOfWork;
+        var user = unitOfWork.Users.GetByPrimaryKey(userId);
+        if (user is null) return Result.Fail("User does not exist.");
+        var chat = unitOfWork.Chats.GetByPrimaryKey(chatId);
+        if (chat is null) return Result.Fail("Question does not exist.");
+        
+        if (chat.State != ChatState.Open) return Result.Fail("Question already closed.");
+        if (userId != chat.UsersQuestioningId) return Result.Fail("Only the user asking the question can close it.");
+
+        chat.State = wasQuestionSolved && chat.UsersAnswererId is not null ? ChatState.ClosedWithAcceptedAnswer : ChatState.ClosedWithoutAcceptedAnswer;
+        if (wasQuestionSolved && chat.UsersAnswererId is not null && int.TryParse(_configuration["Reputation:ReputationForSolvedQuestion"], out var reputationForSolvedQuestion))
+        {
+            var answerer = unitOfWork.Users.GetByPrimaryKey(chat.UsersAnswererId!);
+            answerer!.Reputation += reputationForSolvedQuestion;
+        }
+        unitOfWork.Commit();
+        return Result.Ok();
+    }
+
+    /// <inheritdoc />
     public Result<Chat> ClaimChat(long userId, long chatId)
     {
         using var unitOfWork = _dbService.UnitOfWork;

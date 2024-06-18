@@ -42,6 +42,15 @@ public interface IChatService
     public  Result<Chat> CreateNewChat(long userId, string title, string question);
 
     /// <summary>
+    /// Complete a question
+    /// </summary>
+    /// <param name="userId">The user requesting to close a question.</param>
+    /// <param name="chatId">The chat to complete.</param>
+    /// <param name="wasQuestionSolved">If the question was solved or the question is just closed.</param>
+    /// <returns>The result for the closing of the question.</returns> 
+    public Result CompleteChat(long userId, long chatId, bool wasQuestionSolved);
+    
+    /// <summary>
     /// User sets themselves as the answerer of a chat. 
     /// </summary>
     /// <param name="userId">The user to set as <see cref="Chat.UsersAnswerer"/>.</param>
