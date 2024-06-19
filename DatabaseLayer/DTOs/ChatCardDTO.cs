@@ -1,3 +1,5 @@
-﻿namespace DataBaseLayer.DTOs;
+﻿using DatabaseLayer.Entities.Enums;
 
-public record ChatCardDTO(long id, string Title, string Question, string AuthorName);
+namespace DataBaseLayer.DTOs;
+
+public record ChatCardDTO(long Id, string Title, string Question, ChatState ChatState, string AuthorName);

@@ -1,4 +1,5 @@
 ﻿@using DataBaseLayer.DTOs
+@using DatabaseLayer.Entities.Enums
 @inject NavigationManager NavigationManager
 
 <MudGrid Class="d-flex">
@@ -13,8 +14,11 @@
                 <p class="mb-4 author">by @(chat.AuthorName)</p>
                 <p>@(chat.Question.Length > 100 ? chat.Question[..100] + "..." : chat.Question)</p>
             </MudCardContent>
-            <MudCardActions Class="pt-0">
-                <MudButton Class="ma-2" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo("/Questions/" + chat.id))">Open Question</MudButton>
+            <MudCardActions Class="pt-0 d-flex justify-space-between">
+                <MudButton Class="ma-2" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo("/Questions/" + chat.Id))">Open Question</MudButton>
+                <MudIcon Class="mr-3" hidden="@(!ShowIcons)" 
+                         Icon="@(chat.ChatState switch { ChatState.Open => Icons.Material.Filled.RadioButtonUnchecked, ChatState.ClosedWithAcceptedAnswer => Icons.Material.Filled.CheckCircle, ChatState.ClosedWithoutAcceptedAnswer => Icons.Material.Filled.Cancel })" 
+                         Color="@(chat.ChatState switch { ChatState.Open => Color.Primary, ChatState.ClosedWithAcceptedAnswer => Color.Success, ChatState.ClosedWithoutAcceptedAnswer => Color.Error })"/>
             </MudCardActions>
         </MudCard>
     </MudItem>
@@ -24,4 +28,7 @@
 @code {
     [Parameter]
     public List<ChatCardDTO> Chats { get; set; }
+
+    [Parameter] 
+    public bool ShowIcons { get; set; }
 }

@@ -12,12 +12,11 @@
 
 <MudText hidden="@(AuthenticationService.AuthenticatedUser is not null)">You need to be logged in to have/create questions.</MudText>
 <div hidden="@(AuthenticationService.AuthenticatedUser is null)">
-    <h2>Active Questions</h2>
+    <h2 class="mt-10 mb-3" hidden="@(currentChats.Count == 0)">Active Questions</h2>
     <ChatCards Chats="@(currentChats)"/>
 
-    <h2>Completed Questions</h2>
-
-    <ChatCards Chats="@(completedChats)"/>
+    <h2 class="mt-10 mb-3" hidden="@(completedChats.Count == 0)">Completed Questions</h2>
+    <ChatCards Chats="@(completedChats)" ShowIcons="true"/>
 </div>
 
 

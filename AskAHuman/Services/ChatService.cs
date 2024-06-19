@@ -22,28 +22,28 @@ public class ChatService : IChatService
     public List<ChatCardDTO> GetAllChatsAsCards()
     {
         using var uow = _dbService.UnitOfWork;
-        return uow.Chats.GetAll().Select(c => new ChatCardDTO(c.Id, c.Title, c.Question, c.UsersQuestioning.Username)).ToList();
+        return uow.Chats.GetAll().Select(c => new ChatCardDTO(c.Id, c.Title, c.Question, c.State, c.UsersQuestioning.Username)).ToList();
     }
 
     /// <inheritdoc />
     public List<ChatCardDTO> GetUnansweredChatsAsCards()
     {
         using var uow = _dbService.UnitOfWork;
-        return uow.Chats.GetUnansweredChats().Select(c => new ChatCardDTO(c.Id, c.Title, c.Question, c.UsersQuestioning.Username)).ToList();
+        return uow.Chats.GetUnansweredChats().Select(c => new ChatCardDTO(c.Id, c.Title, c.Question, c.State, c.UsersQuestioning.Username)).ToList();
     }
 
     /// <inheritdoc />
     public List<ChatCardDTO> GetUsersActiveChatsAsCards(long userId)
     {
         using var uow = _dbService.UnitOfWork;
-        return uow.Chats.GetChatsRelatedToUser(userId).Where(c => c.State == ChatState.Open).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question, c.UsersQuestioning.Username)).ToList();
+        return uow.Chats.GetChatsRelatedToUser(userId).Where(c => c.State == ChatState.Open).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question, c.State, c.UsersQuestioning.Username)).ToList();
     }
 
     /// <inheritdoc />
     public List<ChatCardDTO> GetUsersCompletedChatsAsCards(long userId)
     {
         using var uow = _dbService.UnitOfWork;
-        return uow.Chats.GetChatsRelatedToUser(userId).Where(c => c.State != ChatState.Open).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question, c.UsersQuestioning.Username)).ToList();
+        return uow.Chats.GetChatsRelatedToUser(userId).Where(c => c.State != ChatState.Open).Select(c => new ChatCardDTO(c.Id, c.Title, c.Question, c.State, c.UsersQuestioning.Username)).ToList();
     }
 
     /// <inheritdoc />
@@ -85,10 +85,11 @@ public class ChatService : IChatService
         if (userId != chat.UsersQuestioningId) return Result.Fail("Only the user asking the question can close it.");
 
         chat.State = wasQuestionSolved && chat.UsersAnswererId is not null ? ChatState.ClosedWithAcceptedAnswer : ChatState.ClosedWithoutAcceptedAnswer;
+        
         if (wasQuestionSolved && chat.UsersAnswererId is not null && int.TryParse(_configuration["Reputation:ReputationForSolvedQuestion"], out var reputationForSolvedQuestion))
         {
-            var answerer = unitOfWork.Users.GetByPrimaryKey(chat.UsersAnswererId!);
-            answerer!.Reputation += reputationForSolvedQuestion;
+            var answerer = unitOfWork.Users.GetByPrimaryKey(chat.UsersAnswererId);
+            answerer.Reputation += reputationForSolvedQuestion;
         }
         unitOfWork.Commit();
         return Result.Ok();
