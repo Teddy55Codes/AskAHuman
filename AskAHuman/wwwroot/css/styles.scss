@@ -15,6 +15,10 @@ html, .mud-layout, .mud-main-content {
     }
 }
 
+h1:focus {
+    outline: none;
+}
+
 .mud-card-header {
     display: block;
     

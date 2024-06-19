@@ -23,7 +23,7 @@
         </div>
         <div Class="ml-3" hidden="@(chat.UsersAnswererId is null || 
                                     AuthenticationService.AuthenticatedUser != chat.UsersAnswererId)">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LeaveChat">Leave question</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="LeaveChat">Leave question</MudButton>
         </div>
         <div Class="ml-3" hidden="@(AuthenticationService.AuthenticatedUser != chat.UsersQuestioningId || 
                                     chat.UsersAnswererId is null)">
