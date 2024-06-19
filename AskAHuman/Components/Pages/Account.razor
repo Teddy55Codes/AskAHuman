@@ -8,23 +8,44 @@
 @inject NavigationManager NavigationManager
 
 
-<div Class="d-flex">
-    <h1 Class="flex-grow-1">@displayText</h1>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" hidden="@(AuthenticationService.AuthenticatedUser is null || AuthenticationService.AuthenticatedUser != UserId)" OnClick="@(Logout)">Logout</MudButton>
+<h2 hidden="@(error != string.Empty)">@error</h2>
+<div hidden="@(username == null)">
+    <div Class="d-flex">
+        <div class="flex-grow-1">
+            <MudAvatar Size="Size.Large" Color="Color.Primary">@username.ToUpper()[0]</MudAvatar>
+            <h1 Class="mt-3">@username</h1>
+        </div>
+        <MudButton Class="align-self-start" Variant="Variant.Filled" Color="Color.Primary" hidden="@(AuthenticationService.AuthenticatedUser is null || AuthenticationService.AuthenticatedUser != UserId)" OnClick="@(Logout)">Logout</MudButton>
+    </div>
+    <div class="mt-5">
+        <h2>Reputation: @reputation</h2>
+        <h2>Account Created At: @createdAt</h2>
+    </div>
 </div>
 <hr/>
+
 
 @code {
     [Parameter]
     public long UserId { get; set; }
 
-    private bool success;
-    private string displayText;
+    private string error = string.Empty;
+    private string? username;
+    private long? reputation;
+    private string? createdAt;
     
     protected override async Task OnInitializedAsync()
     {
         var userResult = UserService.GetById(UserId);
-        displayText = userResult.IsSuccess ? userResult.Value.Username : userResult.Errors[0].Message;
+        if (userResult.IsSuccess)
+        {
+            username = userResult.Value.Username;
+            reputation = userResult.Value.Reputation;
+            createdAt = $"{userResult.Value.CreatedAt:yyyy-MM-dd} UTC";
+            StateHasChanged();
+        }
+        else error = userResult.Errors[0].Message;
+        
         if (AuthenticationService.AuthenticatedUser is not null || await AuthenticationService.AuthenticateViaLocalStorage(ProtectedLocalStorage))
         {
             StateHasChanged();
