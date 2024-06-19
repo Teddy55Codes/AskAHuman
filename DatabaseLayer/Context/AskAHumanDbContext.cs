@@ -174,7 +174,7 @@ public partial class AskAHumanDbContext(IConfiguration configuration) : DbContex
             entity.Property(e => e.PasswordHash).HasColumnType("text");
             entity.Property(e => e.PasswordSalt).HasColumnType("text");
             entity.Property(e => e.Reputation)
-                .HasComputedColumnSql("0", false)
+                .HasDefaultValueSql("0")
                 .HasColumnType("bigint(20)");
             entity.Property(e => e.Username).HasColumnType("text");
         });
