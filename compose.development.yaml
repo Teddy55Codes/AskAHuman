@@ -17,11 +17,13 @@ services:
   database:
     image: mariadb:11.1.4
     ports:
-      - "3306"
+      - "127.0.0.1:3306:3306"
     environment:
       - "MARIADB_ROOT_PASSWORD=sml12345"
+      - "MARIADB_DATABASE=askahuman"
     volumes:
       - /backup-volume:/backup
+      - ./DatabaseLayer/Docs/script.sql:/docker-entrypoint-initdb.d/ddl.sql
     healthcheck:
       test: ["CMD-SHELL", "mariadb -h 127.0.0.1 -u root --password=sml12345 -e 'SELECT 1'"]
       interval: 2s

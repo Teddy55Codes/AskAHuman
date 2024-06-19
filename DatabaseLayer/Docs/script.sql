@@ -1,25 +1,10 @@
--- MySQL Workbench Forward Engineering
-
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
--- -----------------------------------------------------
--- Schema mydb
--- -----------------------------------------------------
--- -----------------------------------------------------
--- Schema askahuman
--- -----------------------------------------------------
-
--- -----------------------------------------------------
--- Schema askahuman
--- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `askahuman` DEFAULT CHARACTER SET latin1 ;
 USE `askahuman` ;
 
--- -----------------------------------------------------
--- Table `askahuman`.`users`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `askahuman`.`users` (
     `Id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `Username` TEXT NOT NULL,
@@ -32,10 +17,6 @@ CREATE TABLE IF NOT EXISTS `askahuman`.`users` (
     AUTO_INCREMENT = 20
     DEFAULT CHARACTER SET = latin1;
 
-
--- -----------------------------------------------------
--- Table `askahuman`.`chats`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `askahuman`.`chats` (
     `Id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `UsersAnswererId` BIGINT(20) NULL,
@@ -62,10 +43,6 @@ CREATE TABLE IF NOT EXISTS `askahuman`.`chats` (
     AUTO_INCREMENT = 3
     DEFAULT CHARACTER SET = latin1;
 
-
--- -----------------------------------------------------
--- Table `askahuman`.`messages`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `askahuman`.`messages` (
     `Id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `ChatId` BIGINT(20) NOT NULL,
@@ -88,10 +65,6 @@ CREATE TABLE IF NOT EXISTS `askahuman`.`messages` (
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = latin1;
 
-
--- -----------------------------------------------------
--- Table `askahuman`.`permissions`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `askahuman`.`permissions` (
     `Id` INT(11) NOT NULL AUTO_INCREMENT,
     `Name` TEXT NOT NULL,
@@ -100,10 +73,6 @@ CREATE TABLE IF NOT EXISTS `askahuman`.`permissions` (
     AUTO_INCREMENT = 2
     DEFAULT CHARACTER SET = latin1;
 
-
--- -----------------------------------------------------
--- Table `askahuman`.`roles`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `askahuman`.`roles` (
     `Id` INT(11) NOT NULL AUTO_INCREMENT,
     `Name` TEXT NOT NULL,
@@ -112,10 +81,6 @@ CREATE TABLE IF NOT EXISTS `askahuman`.`roles` (
     AUTO_INCREMENT = 3
     DEFAULT CHARACTER SET = latin1;
 
-
--- -----------------------------------------------------
--- Table `askahuman`.`roles_has_permissions`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `askahuman`.`roles_has_permissions` (
     `RoleId` INT(11) NOT NULL,
     `PermissionId` INT(11) NOT NULL,
@@ -135,10 +100,6 @@ CREATE TABLE IF NOT EXISTS `askahuman`.`roles_has_permissions` (
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = latin1;
 
-
--- -----------------------------------------------------
--- Table `askahuman`.`roles_has_users`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `askahuman`.`roles_has_users` (
     `RoleId` INT(11) NOT NULL,
     `UserId` BIGINT(20) NOT NULL,
