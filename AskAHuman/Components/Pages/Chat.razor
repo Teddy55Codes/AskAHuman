@@ -13,6 +13,9 @@
 
 @page "/Questions/{chatId:long}"
 
+<PageTitle>Question</PageTitle>
+
+
 <MudText Class="ml-2" Color="@Color.Error" hidden="@(!isNotFound)">Question does not exist.</MudText>
 
 <MudGrid Class="d-flex flex-column flex-nowrap flex-grow-1 gap-4 mt-1" hidden="@isNotFound">

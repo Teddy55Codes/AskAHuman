@@ -7,6 +7,8 @@
 @inject NavigationManager NavigationManager
 @inject ProtectedLocalStorage ProtectedLocalStorage
 
+<PageTitle>Questions</PageTitle>
+
 <h1>Questions</h1>
 
 <MudButton Class="my-3" Variant="Variant.Filled" Color="Color.Primary" hidden="@(AuthenticationService.AuthenticatedUser is null)" OnClick="@(() => NavigationManager.NavigateTo("/Questions/Create"))">Create New Question</MudButton>
